@@ -70,12 +70,15 @@
 /*
  * LEDs definitions
  */
+// LED_BUILTIN PORT0.PIN5 = PA05 = A4 = Pinout 26
 #define BOARD_LED_PORT                    (0)
-#define BOARD_LED_PIN                     (17)
+#define BOARD_LED_PIN                     (5)
 
+// LED_RX PORT1.3 = PB03 = Pinout 48
 #define BOARD_LEDRX_PORT                  (1)
 #define BOARD_LEDRX_PIN                   (3)
 
+// LED_TX PORT0.27 = PA27 = Pinout 39 
 #define BOARD_LEDTX_PORT                  (0)
 #define BOARD_LEDTX_PIN                   (27)
 
