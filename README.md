@@ -5,10 +5,16 @@ for Atmel's SAMD21 processor (used on the Stimey SAMD21G18A, Gontak Sok One).
 
 ## Installation on Arduino IDE
 
-This core is available as a package in the Arduino IDE cores manager.
-Just open the "Boards Manager" and install the package called:
+To add board support, start Arduino and open the Preferences window (**File** > **Preferences**). Now copy and paste the following URL into the 'Additional Boards Manager URLs' input field:
 
-"NekuNeko SAMD Boards (32-bit ARM Cortex-M0+)"
+    https://nekuneko.github.io/arduino-board-index/package_nekuneko_index.json
+
+If there is already an URL from another manufacturer in that field, click the button at the right end of the field. This will open an editing window allowing you to plaste the above URL onto a new line.
+
+After that, this core will be available as a package in the Arduino IDE cores manager.
+Just open the (**Tools** > **Board** > **Boards Manager**) and install the package called:
+
+**NekuNeko SAMD Boards (32-bit ARM Cortex-M0+)**
 
 ## Support
 
