@@ -77,6 +77,11 @@ void init( void )
   // Clock TC/TCC for Pulse and Analog
   PM->APBCMASK.reg |= PM_APBCMASK_TCC0 | PM_APBCMASK_TCC1 | PM_APBCMASK_TCC2 | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
 
+// NEKU WAS HERE. Enable TC6 & TC7 for __SAMD21J18A__
+#if defined (__SAMD21J18A__)
+  PM->APBCMASK.reg |= PM_APBCMASK_TC6 | PM_APBCMASK_TC7;
+#endif // __SAMD21J18A__
+
   // Clock ADC/DAC for Analog
   PM->APBCMASK.reg |= PM_APBCMASK_ADC | PM_APBCMASK_DAC ;
 

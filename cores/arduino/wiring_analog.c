@@ -129,59 +129,69 @@ uint32_t analogRead(uint32_t pin)
 {
   uint32_t valueRead = 0;
 
+/*
+  // NEKU WAS HERE. Naturally Analog pins (with ADC chanels asociated) are being forced to be digital, this code stops them to unleash its inner power. 
+  // It's better to consider if the pin has the PIN_ATTR_ANALOG for improve flexibility, that's what you guys do on analogWrite function. 
   if (pin < A0) {
     pin += A0;
   }
+*/
+  PinDescription pinDesc = g_APinDescription[pin];
+  uint32_t attr = pinDesc.ulPinAttribute;
 
-  pinPeripheral(pin, PIO_ANALOG);
+  if ((attr & PIN_ATTR_ANALOG) == PIN_ATTR_ANALOG)
+  {
+    pinPeripheral(pin, PIO_ANALOG);
 
-  if (pin == A0) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
-    syncDAC();
-    DAC->CTRLA.bit.ENABLE = 0x00; // Disable DAC
-    //DAC->CTRLB.bit.EOEN = 0x00; // The DAC output is turned off.
-    syncDAC();
+    // NEKU WAS HERE. DAC is on PA02, so why don't you consider this instead of 'A0'? If so we can assign A0 to another Port Pin in our own boards.
+    //if (pin == A0) { 
+    if (pinDesc.ulPort == PORTA && pinDesc.ulPin == 2u) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
+      syncDAC();
+      DAC->CTRLA.bit.ENABLE = 0x00; // Disable DAC
+      //DAC->CTRLB.bit.EOEN = 0x00; // The DAC output is turned off.
+      syncDAC();
+    }
+
+    syncADC();
+    ADC->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin].ulADCChannelNumber; // Selection for the positive ADC input
+
+    // Control A
+    /*
+     * Bit 1 ENABLE: Enable
+     *   0: The ADC is disabled.
+     *   1: The ADC is enabled.
+     * Due to synchronization, there is a delay from writing CTRLA.ENABLE until the peripheral is enabled/disabled. The
+     * value written to CTRL.ENABLE will read back immediately and the Synchronization Busy bit in the Status register
+     * (STATUS.SYNCBUSY) will be set. STATUS.SYNCBUSY will be cleared when the operation is complete.
+     *
+     * Before enabling the ADC, the asynchronous clock source must be selected and enabled, and the ADC reference must be
+     * configured. The first conversion after the reference is changed must not be used.
+     */
+    syncADC();
+    ADC->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
+
+    // Start conversion
+    syncADC();
+    ADC->SWTRIG.bit.START = 1;
+
+    // Clear the Data Ready flag
+    ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
+
+    // Start conversion again, since The first conversion after the reference is changed must not be used.
+    syncADC();
+    ADC->SWTRIG.bit.START = 1;
+
+    // Store the value
+    while (ADC->INTFLAG.bit.RESRDY == 0);   // Waiting for conversion to complete
+    valueRead = ADC->RESULT.reg;
+
+    syncADC();
+    ADC->CTRLA.bit.ENABLE = 0x00;             // Disable ADC
+    syncADC();
   }
-
-  syncADC();
-  ADC->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin].ulADCChannelNumber; // Selection for the positive ADC input
-
-  // Control A
-  /*
-   * Bit 1 ENABLE: Enable
-   *   0: The ADC is disabled.
-   *   1: The ADC is enabled.
-   * Due to synchronization, there is a delay from writing CTRLA.ENABLE until the peripheral is enabled/disabled. The
-   * value written to CTRL.ENABLE will read back immediately and the Synchronization Busy bit in the Status register
-   * (STATUS.SYNCBUSY) will be set. STATUS.SYNCBUSY will be cleared when the operation is complete.
-   *
-   * Before enabling the ADC, the asynchronous clock source must be selected and enabled, and the ADC reference must be
-   * configured. The first conversion after the reference is changed must not be used.
-   */
-  syncADC();
-  ADC->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
-
-  // Start conversion
-  syncADC();
-  ADC->SWTRIG.bit.START = 1;
-
-  // Clear the Data Ready flag
-  ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
-
-  // Start conversion again, since The first conversion after the reference is changed must not be used.
-  syncADC();
-  ADC->SWTRIG.bit.START = 1;
-
-  // Store the value
-  while (ADC->INTFLAG.bit.RESRDY == 0);   // Waiting for conversion to complete
-  valueRead = ADC->RESULT.reg;
-
-  syncADC();
-  ADC->CTRLA.bit.ENABLE = 0x00;             // Disable ADC
-  syncADC();
 
   return mapResolution(valueRead, _ADCResolution, _readResolution);
 }
-
 
 // Right now, PWM output only works on the pins with
 // hardware support.  These are defined in the appropriate
@@ -196,18 +206,21 @@ void analogWrite(uint32_t pin, uint32_t value)
   {
     // DAC handling code
 
-    if (pin != PIN_A0) { // Only 1 DAC on A0 (PA02)
+    // NEKU WAS HERE. If only 1 DAC on PA02, let's check it, insted of check A0. And it can be analog and be assigned with a TIMER.
+    //if (pin != PIN_A0) { 
+    if (pinDesc.ulPort == PORTA && pinDesc.ulPin == 2u) { // Only 1 DAC on A0 (PA02)
+  //    return;
+  //  }
+
+      value = mapResolution(value, _writeResolution, 10);
+
+      syncDAC();
+      DAC->DATA.reg = value & 0x3FF;  // DAC on 10 bits.
+      syncDAC();
+      DAC->CTRLA.bit.ENABLE = 0x01;     // Enable DAC
+      syncDAC();
       return;
     }
-
-    value = mapResolution(value, _writeResolution, 10);
-
-    syncDAC();
-    DAC->DATA.reg = value & 0x3FF;  // DAC on 10 bits.
-    syncDAC();
-    DAC->CTRLA.bit.ENABLE = 0x01;     // Enable DAC
-    syncDAC();
-    return;
   }
 
   if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM)
