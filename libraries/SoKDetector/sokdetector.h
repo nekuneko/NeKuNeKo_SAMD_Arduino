@@ -49,13 +49,14 @@
 
 #include <Arduino.h>
 
-#define DEVIATION            25    // Standard deviation for selection
-#define RESISTANCE_MAIN     5100  // Ohms (R1)
-#define RESISTANCE_GAMESOK  220   // Ohms (R2)
-#define RESISTANCE_DRIVESOK 510   // Ohms (R2)
+#define DEVIATION            25  // Standard deviation for selection
+#define RESISTANCE_MAIN     5100 // Ohms (R1)
+#define RESISTANCE_GAMESOK  220  // Ohms (R2)
+#define RESISTANCE_DRIVESOK 510  // Ohms (R2)
+#define MAX_VOUT 			3.3	 // V maximum pin ADC Voltage 
 
 
 
-int calculateAnalogValue (float VIN, float R1, float R2, int adcResolution, float MAX_VOUT);
+int calculateAnalogValue (float VIN, float R1, float R2, int adcResolution);
 
 int determineBoard (int pin, int adcResolution);

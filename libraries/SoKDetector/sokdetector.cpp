@@ -1,6 +1,6 @@
 #include "sokdetector.h"
 
-int calculateAnalogValue (float VIN, float R1, float R2, int adcResolution, float MAX_VOUT)
+int calculateAnalogValue (float VIN, float R1, float R2, int adcResolution)
 {
   float vout = R2 / (R1+R2) * VIN;
   float aout = (vout * (pow(2, adcResolution)-1) / MAX_VOUT);
@@ -18,8 +18,8 @@ int determineBoard (int pin, int adcResolution)
   //pinMode(pin, INPUT);
   //delay(1000);
 
-  int ANALOG_GAMESOK  = calculateAnalogValue(3.3, RESISTANCE_MAIN, RESISTANCE_GAMESOK,  adcResolution, 3.3);
-  int ANALOG_DRIVESOK = calculateAnalogValue(5, RESISTANCE_MAIN, RESISTANCE_DRIVESOK, adcResolution, 3.3);
+  int ANALOG_GAMESOK  = calculateAnalogValue(3.3, RESISTANCE_MAIN, RESISTANCE_GAMESOK,  adcResolution);
+  int ANALOG_DRIVESOK = calculateAnalogValue(5, RESISTANCE_MAIN, RESISTANCE_DRIVESOK, adcResolution);
 
   // Read detected analog value
   int analog=0;
