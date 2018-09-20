@@ -49,7 +49,7 @@ void DriveSoK::go (bool forward, uint8_t power, int duration)
 void DriveSoK::stop ()
 {
 	motorRear->brake();
-	motorFront->brake();
+	//motorFront->brake();
 }
 
 
