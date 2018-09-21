@@ -1,87 +1,111 @@
 #include "hj580.h"
 
 
-bool HJ580::begin (String softVersion, String baud, Uart* u)
+bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 {
-	bool success = false;
-
+	bool success   = true;
 	this->baudRate = baud;
-	this->uart = u;
+	this->uart     = u;
+
+
+	this->uart->begin(19200);
+	while(!uart);
 
 	// BLE: Pin initialization
 	pinMode(BLE_RESET,     OUTPUT);   // HIGH - Reset,        LOW  - System ON 
 	pinMode(BLE_CONFIG,    OUTPUT);   // LOW  - AT-Commands,  HIGH - Transparent UART mode
-
 	
-	digitalWrite(BLE_CONFIG, HIGH);
 	reset();
-	
-
-	uart->begin(19200); delay(100);
-
-
 
 	// BLE Initial Configuration
-	success = setBaudRate (baudRate);
-	//SerialUSB.println("Baudrate: " + String(success));
-	success &= setFactory("NeKuNeKo Inc.");
-	//SerialUSB.println("factoryName: " + String(success));
-	if (!softVersion.equals(""))
-		success &= setVersion(softVersion);
-	//SerialUSB.println("softVersion: " + String(success));
-	disconnect();
+	String commands[5] = { "NAME"+String("SoK Zero"), "SOFT"+softVersion, "FAC"+String("NeKuNeKo Inc."),  "BAUD"+String(baudRate), "DISCONNECT"};
+	writeCommands(commands, 5);
 
-	this->uart->begin(baudRate.toInt()); 	//delay(150); 
+	this->uart->begin(baudRate);
+	while(!uart);
 	
-	//SerialUSB.println("success: " + String(success));
 	return success;
 }
 
-void HJ580::reset ()
+void HJ580::reset (unsigned long timeReset)
 {
-	digitalWrite(BLE_RESET, HIGH);    delay(100); // Perform Reset
+	digitalWrite(BLE_RESET, HIGH);    delay(timeReset); // Perform Reset
     digitalWrite(BLE_RESET, LOW);     //delay(150); // Release reset, System ON in AT COMMAND mode.
 }
 
 
-String HJ580::readCommandTimeout (unsigned long timeout) 
-{
-	unsigned long currentTime, startTime = millis();
 
-	while(!uart->available() && (currentTime - startTime <= timeout))
-		currentTime = millis();
-	return uart->readString();
+String HJ580::readCommand (unsigned long timeout)
+{
+	this->uart->setTimeout(timeout);
+	return this->uart->readString();
 }
 
-String HJ580::readCommand ()
-{
-	while(!uart->available());
-	return uart->readString();
-}
 
+
+
+bool HJ580::writeCommands (String* commands, int size)
+{
+	String response = "";
+	String command  = "";
+	bool   success  = true;
+
+	atmodeON(); // Enter AT Command mode
+
+	for (int i=0; i<=size-1; ++i)
+	{
+		command = "<"+commands[i]+">";
+		this->uart->write(command.c_str());		// Send AT Command
+		response = readCommand(); 				// Receive Acknowledgement
+
+		// Erase characters '<' & '>'
+		response.substring(1, response.length()-1);
+		
+		// Debug
+		SerialUSB.print(command + ": ");
+		SerialUSB.println(response);	
+
+		success &= checkResponse(response);
+	}
+
+	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
+
+	return success;
+}
 
 String HJ580::writeCommand (String command)
 {
-	digitalWrite(BLE_CONFIG, LOW);    		delay(150); // Enter AT Command mode
+	String response = "";
+
+	atmodeON(); // Enter AT Command mode
 	
 	command = "<"+command+">";
-	this->uart->write(command.c_str());     delay(150); // Send AT Command
-	String response = readCommand(); // Receive Acknowledgement
+	this->uart->write(command.c_str());  	// Send AT Command
+	response = readCommand(); 				// Receive Acknowledgement
 
-	digitalWrite(BLE_CONFIG, HIGH);       		// Enter Transparent UART mode
+	// Erase characters '<' & '>'
+	response.substring(1, response.length()-1);
+
+	// Debug
+	SerialUSB.print(command + ": ");
+	SerialUSB.println(response);	
+
+	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
 
 	return response;
 }
 
 
-bool HJ580::checkCommand (String command)
+bool HJ580::checkResponse (String response)
 {
-	String response = writeCommand(command);
-	//SerialUSB.println(response);
-
-	if (response.equalsIgnoreCase("<OK>") || 
-		response.equalsIgnoreCase("<CONNECTED>"))
+	if (response.equalsIgnoreCase("OK") || 
+		response.equalsIgnoreCase("CONNECTED"))
 	  return true;
 	else 
 	  return false; 
+}
+
+bool HJ580::checkCommand (String command)
+{
+	checkResponse(writeCommand(command));
 }
