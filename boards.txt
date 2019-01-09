@@ -15,37 +15,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-# Stimey SAMD21G18A
-# ---------------------------------------
-stimey.name=Stimey (SAMD21G18A)
-stimey.vid.0=0x1993
-stimey.pid.0=0x0000
-stimey.vid.1=0x1993
-stimey.pid.1=0x000B
-stimey.upload.tool=bossac
-stimey.upload.protocol=sam-ba
-stimey.upload.maximum_size=262144
-stimey.upload.offset=0x2000
-stimey.upload.use_1200bps_touch=true
-stimey.upload.wait_for_upload_port=true
-stimey.upload.native_usb=true
-stimey.build.mcu=cortex-m0plus
-stimey.build.f_cpu=48000000L
-stimey.build.usb_product="Stimey"
-stimey.build.usb_manufacturer="NeKuNeKo"
-stimey.build.board=SAMD_FEATHER_M0
-stimey.build.core=arduino
-stimey.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
-stimey.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-stimey.build.openocdscript=openocd_scripts/arduino_zero.cfg
-stimey.build.variant=stimey
-stimey.build.variant_system_lib=
-stimey.build.vid=0x1993
-stimey.build.pid=0x0000
-stimey.bootloader.tool=openocd
-stimey.bootloader.file=stimey/samd21_sam_ba_stimey.bin
-
-
 # Gontak SoK Zero Rev 4
 # ---------------------------------------
 sok_zero.name=SoK Zero (SAMD21J18A)
@@ -74,34 +43,4 @@ sok_zero.build.variant_system_lib=
 sok_zero.build.vid=0x1993
 sok_zero.build.pid=0x0019
 sok_zero.bootloader.tool=openocd
-sok_zero.bootloader.file=stimey/samd21_sam_ba_stimey.bin
-
-# Gontak SoK Zero Rev 1
-# ---------------------------------------
-sok_zero_rev1.name=SoK Zero Rev1 (SAMD21J18A)
-sok_zero_rev1.vid.0=0x1993
-sok_zero_rev1.pid.0=0x0019
-sok_zero_rev1.vid.1=0x1993
-sok_zero_rev1.pid.1=0x0026
-sok_zero_rev1.upload.tool=bossac
-sok_zero_rev1.upload.protocol=sam-ba
-sok_zero_rev1.upload.maximum_size=262144
-sok_zero_rev1.upload.offset=0x2000
-sok_zero_rev1.upload.use_1200bps_touch=true
-sok_zero_rev1.upload.wait_for_upload_port=true
-sok_zero_rev1.upload.native_usb=true
-sok_zero_rev1.build.mcu=cortex-m0plus
-sok_zero_rev1.build.f_cpu=48000000L
-sok_zero_rev1.build.usb_product="SoK Zero"
-sok_zero_rev1.build.usb_manufacturer="NeKuNeKo"
-sok_zero_rev1.build.board=SAMD_SOK
-sok_zero_rev1.build.core=arduino
-sok_zero_rev1.build.extra_flags=-D__SAMD21J18A__ {build.usb_flags}
-sok_zero_rev1.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-sok_zero_rev1.build.openocdscript=openocd_scripts/sok_zero_rev1.cfg
-sok_zero_rev1.build.variant=sok_zero_rev1
-sok_zero_rev1.build.variant_system_lib=
-sok_zero_rev1.build.vid=0x1993
-sok_zero_rev1.build.pid=0x0019
-sok_zero_rev1.bootloader.tool=openocd
-sok_zero_rev1.bootloader.file=stimey/samd21_sam_ba_stimey.bin
+sok_zero.bootloader.file=sok_zero/samd21_sam_ba_sok_zero.bin
