@@ -37,9 +37,6 @@ void DriveSoK::turn (int power, int delayMillis)
 	power = constrain(power, -100, 100);
 	power = map(power, -100, 100, -255, 255); // 255 is for 8 bit analog write resolution
 	foreMotor->drive(power, delayMillis);
-
-//	if (power == 0)
-//		foreMotor->brake();
 }
 
 
@@ -64,9 +61,6 @@ void DriveSoK::go (int power, int delayMillis)
 		turnBackLights(ON);
 	else // forward, turn off back lights
 		turnBackLights(OFF);
-
-//	if (power == 0)
-//		foreMotor->brake();
 }
 
 
@@ -99,6 +93,9 @@ void DriveSoK::turnBackLights (bool onOff)
 
 void DriveSoK::flashLights (int delayMillis, int numFlashes)
 {
+	bool backupForeLighState = foreLightState();
+	bool backupBackLighState = foreLightState();
+
 	for (int i=1; i<=numFlashes; ++i)
 	{
 		turnForeLights(ON);
@@ -113,10 +110,10 @@ void DriveSoK::flashLights (int delayMillis, int numFlashes)
 	}
 
 	// restore previous light state
-	if (_foreLightState)
+	if (backupForeLighState)
 		turnForeLights(ON);
 
-	if (_backLightState)
+	if (backupBackLighState)
 		turnBackLights(ON);
 }
 
