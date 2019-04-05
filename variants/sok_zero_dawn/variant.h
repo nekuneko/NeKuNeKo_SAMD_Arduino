@@ -58,8 +58,7 @@ extern "C"
 #define NUM_DIGITAL_PINS     (24u)
 #define NUM_ANALOG_INPUTS    (20u)
 #define NUM_ANALOG_OUTPUTS   (1u)
-#define analogInputToDigitalPin(p)  ((p < 24u) ? (p) + 20u : -1) 
-#warning "REVISAR analogInputToDigitalPin() en variant.h" 
+#define analogInputToDigitalPin(p)  ((p < 20u) ? (p) + 25u : -1) 
 
 #define digitalPinToPort(P)        ( &(PORT->Group[g_APinDescription[P].ulPort]) )
 #define digitalPinToBitMask(P)     ( 1 << g_APinDescription[P].ulPin )
