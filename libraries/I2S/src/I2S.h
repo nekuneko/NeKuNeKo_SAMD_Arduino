@@ -52,7 +52,9 @@ public:
   virtual size_t write(const uint8_t *buffer, size_t size);
 
   virtual int availableForWrite();
-
+#if defined(__SAMD51__)
+  void read(int32_t *left, int32_t *right); // this function is NOT available on Standard Arduino's I2S API, just for testing
+#endif
   int read(void* buffer, size_t size);
 
   size_t write(int);
