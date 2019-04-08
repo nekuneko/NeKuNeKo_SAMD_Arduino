@@ -15,9 +15,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-# Gontak SoK Zero Rev 4
+# Gontak SoK Zero Rev 4 (Deprecated)
 # ---------------------------------------
-sok_zero.name=SoK Zero (SAMD21J18A)
+sok_zero.name=SoK Zero (SAMD21J18A) [Deprecated] 
 sok_zero.vid.0=0x1993
 sok_zero.pid.0=0x0019
 sok_zero.vid.1=0x1993
@@ -32,7 +32,7 @@ sok_zero.upload.native_usb=true
 sok_zero.build.mcu=cortex-m0plus
 sok_zero.build.f_cpu=48000000L
 sok_zero.build.usb_product="SoK Zero"
-sok_zero.build.usb_manufacturer="NeKuNeKo"
+sok_zero.build.usb_manufacturer="NeKuNeKo Inc."
 sok_zero.build.board=SAMD_SOK
 sok_zero.build.core=arduino
 sok_zero.build.extra_flags=-D__SAMD21J18A__ {build.usb_flags}
@@ -44,3 +44,70 @@ sok_zero.build.vid=0x1993
 sok_zero.build.pid=0x0019
 sok_zero.bootloader.tool=openocd
 sok_zero.bootloader.file=sok_zero/samd21_sam_ba_sok_zero.bin
+
+
+# SoK Zero Dawn Rev 1 (SAMD21J18A)
+# ---------------------------------------
+sok_zero_dawn.name=SoK Zero Dawn (SAMD21J18A)
+sok_zero_dawn.vid.0=0x1993
+sok_zero_dawn.pid.0=0x0119
+sok_zero_dawn.vid.1=0x1993
+sok_zero_dawn.pid.1=0x0126
+sok_zero_dawn.upload.tool=bossac
+sok_zero_dawn.upload.protocol=sam-ba
+sok_zero_dawn.upload.maximum_size=262144
+sok_zero_dawn.upload.offset=0x2000
+sok_zero_dawn.upload.use_1200bps_touch=true
+sok_zero_dawn.upload.wait_for_upload_port=true
+sok_zero_dawn.upload.native_usb=true
+sok_zero_dawn.build.mcu=cortex-m0plus
+sok_zero_dawn.build.f_cpu=48000000L
+sok_zero_dawn.build.usb_product="SoK Zero Dawn"
+sok_zero_dawn.build.usb_manufacturer="NeKuNeKo Inc."
+sok_zero_dawn.build.board=SOK_ZERO_DAWN
+sok_zero_dawn.build.core=arduino
+sok_zero_dawn.build.extra_flags=-D__SAMD21J18A__ -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DNEKUNEKO_SOK_ZERO_DAWN {build.usb_flags}
+sok_zero_dawn.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+sok_zero_dawn.build.openocdscript=openocd_scripts/sok_zero_dawn.cfg
+sok_zero_dawn.build.variant=sok_zero_dawn
+sok_zero_dawn.build.variant_system_lib=
+sok_zero_dawn.build.vid=0x1993
+sok_zero_dawn.build.pid=0x0119
+sok_zero_dawn.bootloader.tool=openocd
+sok_zero_dawn.bootloader.file=sok_zero_dawn/samd21_sam_ba_sok_zero_dawn.bin
+
+
+# SoK Dark Dawn Rev 1 (SAMD51J20A)
+# ---------------------------------------
+sok_dark_dawn.name=SoK Dark Dawn (SAMD51J20A)
+sok_dark_dawn.vid.0=0x1993
+sok_dark_dawn.pid.0=0x0219
+sok_dark_dawn.vid.1=0x1993
+sok_dark_dawn.pid.1=0x0226
+sok_dark_dawn.upload.tool=bossac18
+sok_dark_dawn.upload.protocol=sam-ba
+sok_dark_dawn.upload.maximum_size=507904
+sok_dark_dawn.upload.offset=0x4000
+sok_dark_dawn.upload.use_1200bps_touch=true
+sok_dark_dawn.upload.wait_for_upload_port=true
+sok_dark_dawn.upload.native_usb=true
+sok_dark_dawn.build.mcu=cortex-m4
+sok_dark_dawn.build.f_cpu=120000000L
+sok_dark_dawn.build.usb_product="SoK Dark Dawn"
+sok_dark_dawn.build.usb_manufacturer="NeKuNeKo Inc."
+sok_dark_dawn.build.board=SOK_DARK_DAWN
+sok_dark_dawn.build.core=arduino
+sok_dark_dawn.build.extra_flags=-D__SAMD51J20A__ -DADAFRUIT_METRO_M4_EXPRESS -D__SAMD51__ {build.usb_flags} -D__FPU_PRESENT -DARM_MATH_CM4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
+sok_dark_dawn.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+sok_dark_dawn.build.openocdscript=openocd_scripts/sok_dark_dawn.cfg
+sok_dark_dawn.build.variant=sok_dark_dawn
+sok_dark_dawn.build.variant_system_lib=
+sok_dark_dawn.build.vid=0x1993
+sok_dark_dawn.build.pid=0x0226
+sok_dark_dawn.bootloader.tool=openocd
+sok_dark_dawn.bootloader.file=sok_dark_dawn/bootloader-metro_m4-v2.0.0-adafruit.5.bin
+sok_dark_dawn.compiler.arm.cmsis.ldflags="-L{build.variant.path}" -larm_cortexM4lf_math -mfloat-abi=hard -mfpu=fpv4-sp-d16
+sok_dark_dawn.menu.cache.on=Enabled
+sok_dark_dawn.menu.cache.on.build.cache_flags=-DENABLE_CACHE
+sok_dark_dawn.menu.cache.off=Disabled
+sok_dark_dawn.menu.cache.off.build.cache_flags=
