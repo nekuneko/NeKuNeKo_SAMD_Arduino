@@ -94,7 +94,7 @@ void DriveSoK::turnBackLights (bool onOff)
 void DriveSoK::flashLights (int delayMillis, int numFlashes)
 {
 	bool backupForeLighState = foreLightState();
-	bool backupBackLighState = foreLightState();
+	bool backupBackLighState = backLightState();
 
 	for (int i=1; i<=numFlashes; ++i)
 	{
