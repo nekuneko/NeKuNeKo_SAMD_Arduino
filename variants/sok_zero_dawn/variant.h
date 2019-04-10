@@ -85,10 +85,14 @@ extern "C"
 #define BLE_STATE    (19u)
 #define BLE_CONFIG   (20u)
 
-
+#define PIN_NOT_CONNECTED (24u)
 // LEDs
 #define PIN_LED_13           (14u)
+#define PIN_LED_RXL          PIN_NOT_CONNECTED // -- unused
+#define PIN_LED_TXL          PIN_NOT_CONNECTED // -- unused
 #define PIN_LED              PIN_LED_13
+#define PIN_LED2             PIN_LED_RXL
+#define PIN_LED3             PIN_LED_TXL
 #define LED_BUILTIN          PIN_LED_13
 
 /*
@@ -143,10 +147,10 @@ static const uint8_t DAC0 = PIN_DAC0;
 #define ADC_RESOLUTION		12
 
 // Other pins
-#define PIN_ATN              (53ul)  // -- unsed, arduino zero default is on 38ul, PA13
-static const uint8_t ATN = PIN_ATN;
+#define PIN_ATN             PIN_NOT_CONNECTED   // -- unsed, arduino zero default is on 38ul, PA13
+static const uint8_t ATN =  PIN_ATN;
 
-#define PIN_USB_HOST_ENABLE (53u) // -- unused
+#define PIN_USB_HOST_ENABLE PIN_NOT_CONNECTED   // -- unused
 
 /*
  * Serial interfaces
@@ -172,7 +176,7 @@ static const uint8_t ATN = PIN_ATN;
 #define PIN_SPI_MOSI         (49u)
 #define PIN_SPI_SCK          (50u)
 #define PIN_SPI_MISO         (51u)
-#define PIN_SPI_SS           (-1u) // NC, UNDEFINED
+#define PIN_SPI_SS           PIN_NOT_CONNECTED // NC, UNDEFINED
 #define PERIPH_SPI           sercom1
 #define PAD_SPI_TX           SPI_PAD_2_SCK_3
 #define PAD_SPI_RX           SERCOM_RX_PAD_0
@@ -187,7 +191,7 @@ static const uint8_t SS   = PIN_SPI_SS   ;  // HW SS isn't used. Set here only f
 #define PIN_SPI1_MOSI        (52u)
 #define PIN_SPI1_SCK         (53u)
 #define PIN_SPI1_MISO        (54u)
-#define PIN_SPI1_SS          (-1u) // NC, UNDEFINED
+#define PIN_SPI1_SS          PIN_NOT_CONNECTED // NC, UNDEFINED
 #define PERIPH_SPI1          sercom2
 #define PAD_SPI1_TX          SPI_PAD_3_SCK_1
 #define PAD_SPI1_RX          SERCOM_RX_PAD_0
