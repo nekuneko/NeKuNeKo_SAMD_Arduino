@@ -56,7 +56,7 @@ const PinDescription g_APinDescription[]=
  
   // 14...24 - Extra Digital Pins!
   // --------------------  
-  { PORTA, 17, PIO_TIMER,       (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                    No_ADC_Channel, PWM2_CH1,   TC2_CH1,      EXTERNAL_INT_NONE },  // 14 D14                      /         /     TC2_WO[1]  /        / (BUILTIN_LED)
+  { PORTA, 17, PIO_TIMER,       (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                    No_ADC_Channel, PWM2_CH1,   TCC2_CH1,     EXTERNAL_INT_NONE },  // 14 D14                      /         /    TCC2_WO[1]  /        / (BUILTIN_LED)
   { PORTA, 27, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_15 },    // 15 D15                      /         /                / INT_15 / (BLE_RESET)          
   { PORTA, 28, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_8 },     // 16 D16                      /         /                / INT_8  / (BLE_ENABLE)      
   { PORTB, 31, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_15 },    // 17 D17                      /         /                / INT_15 / (BLE_CONFIG)      
@@ -78,7 +78,7 @@ const PinDescription g_APinDescription[]=
   { PORTA,  2, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel0,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2},      // 29 A4                       / AIN[0]  /                / INT_2
   { PORTB,  4, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel12, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4 },     // 30 A5                       / AIN[12] /                / INT_4*
   { PORTB,  5, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel13, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5 },     // 31 A6                       / AIN[13] /                / INT_5*
-  { PORTA,  9, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel17, PWM1_CH3,   TC3_CH3,      EXTERNAL_INT_9 },     // 32 A7                       / AIN[17] /     TC3_WO[3]  / INT_9*
+  { PORTA,  9, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel17, PWM1_CH3,   TCC1_CH3,     EXTERNAL_INT_9 },     // 32 A7                       / AIN[17] /    TCC1_WO[3]  / INT_9*
   { PORTB,  6, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel14, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_6 },     // 33 A8                       / AIN[14] /                / INT_6*
   { PORTB,  7, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel15, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_7 },     // 34 A9                       / AIN[15] /                / INT_7*
   { PORTA,  4, PIO_SERCOM_ALT,  (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel4,  PWM0_CH0,   TCC0_CH0,     EXTERNAL_INT_4 },     // 35 A10  ALT_SERCOM0_PAD[0]  / AIN[4]  /     TCC0_WO[0] / INT_4  / (D0, Serial_TX)
@@ -158,33 +158,10 @@ SERCOM sercom5( SERCOM5 ) ;
 Uart Serial ( &sercom0, PIN_SERIAL_RX,  PIN_SERIAL_TX,  PAD_SERIAL_RX,  PAD_SERIAL_TX  );
 Uart Serial1( &sercom5, PIN_SERIAL1_RX, PIN_SERIAL1_TX, PAD_SERIAL1_RX, PAD_SERIAL1_TX );
 
-TwoWire Wire ( &PERIPH_WIRE,  PIN_WIRE_SDA,  PIN_WIRE_SCL  ) ;
-TwoWire Wire1( &PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL ) ;
-
 
 void SERCOM0_Handler()
 {
   Serial.IrqHandler();
-} // */
-/*
-void SERCOM1_Handler ()
-{
-  // SPI
-} // */
-/*
-void SERCOM2_Handler ()
-{
-  // SPI1
-} // */
-
-void SERCOM3_Handler()
-{
-  Wire1.onService();
-} // */
-
-void SERCOM4_Handler()
-{
-  Wire.onService();
 } // */
 
 void SERCOM5_Handler()
