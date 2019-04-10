@@ -146,6 +146,8 @@ static const uint8_t DAC0 = PIN_DAC0;
 #define PIN_ATN              (53ul)  // -- unsed, arduino zero default is on 38ul, PA13
 static const uint8_t ATN = PIN_ATN;
 
+#define PIN_USB_HOST_ENABLE (53u) // -- unused
+
 /*
  * Serial interfaces
  */
