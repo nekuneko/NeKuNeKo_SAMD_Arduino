@@ -158,7 +158,7 @@ void driveLoop ()
 {
 	String command = ble.readCommand();
 
-	SerialUSB.println(command);
+	//Serial.println(command);
 	int a;
 
 	if (command.equalsIgnoreCase("arrancar"))

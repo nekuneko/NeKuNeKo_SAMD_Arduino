@@ -147,11 +147,11 @@ static const uint8_t ATN = PIN_ATN;
 /*
  * Serial interfaces
  */
-// Serial (BLE_HJ580XP)
-#define PIN_SERIAL_TX       (45ul)
-#define PIN_SERIAL_RX       (46ul)
-#define PAD_SERIAL_TX       (UART_TX_PAD_2)
-#define PAD_SERIAL_RX       (SERCOM_RX_PAD_3)
+// SerialBLE (BLE_HJ580XP)
+#define PIN_SERIAL_BLE_TX    (45ul)
+#define PIN_SERIAL_BLE_RX    (46ul)
+#define PAD_SERIAL_BLE_TX    (UART_TX_PAD_2)
+#define PAD_SERIAL_BLE_RX    (SERCOM_RX_PAD_3)
 
 // Serial1 (D0/D1)
 #define PIN_SERIAL1_TX       (0ul)
@@ -269,7 +269,7 @@ extern SERCOM sercom3;
 extern SERCOM sercom4;
 extern SERCOM sercom5;
 
-extern Uart Serial;
+extern Uart SerialBLE;
 extern Uart Serial1;
 
 #endif
@@ -289,13 +289,10 @@ extern Uart Serial1;
 //
 // SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
 //                            pins are NOT connected to anything by default.
-#define SERIAL_PORT_USBVIRTUAL      SerialUSB
-#define SERIAL_PORT_MONITOR         SerialUSB
+#define SERIAL_PORT_USBVIRTUAL      Serial
+#define SERIAL_PORT_MONITOR         Serial
 
-//#define SERIAL_PORT_HARDWARE        Serial
-#define SERIAL_PORT_HARDWARE_OPEN   Serial
-
-#define SERIAL_PORT_HARDWARE        Serial1
+#define SERIAL_PORT_HARDWARE        SerialBLE
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 
 

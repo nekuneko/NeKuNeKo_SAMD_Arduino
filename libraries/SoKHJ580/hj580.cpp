@@ -62,8 +62,8 @@ bool HJ580::writeCommands (String* commands, int size)
 		response.substring(1, response.length()-1);
 		
 		// Debug
-		SerialUSB.print(command + ": ");
-		SerialUSB.println(response);	
+		Serial.print(command + ": ");
+		Serial.println(response);	
 
 		success &= checkResponse(response);
 	}
@@ -87,8 +87,8 @@ String HJ580::writeCommand (String command)
 	response.substring(1, response.length()-1);
 
 	// Debug
-	SerialUSB.print(command + ": ");
-	SerialUSB.println(response);	
+	Serial.print(command + ": ");
+	Serial.println(response);	
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
 
