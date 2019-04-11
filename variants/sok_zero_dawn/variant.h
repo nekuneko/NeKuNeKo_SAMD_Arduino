@@ -83,7 +83,6 @@ extern "C"
 #define BLE_CONFIG   (17u)
 #define BLE_MSTR_SLV (18u)
 #define BLE_STATE    (19u)
-#define BLE_CONFIG   (20u)
 
 #define PIN_NOT_CONNECTED (24u)
 // LEDs
@@ -94,6 +93,33 @@ extern "C"
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 #define LED_BUILTIN          PIN_LED_13
+
+static const uint8_t D0   = 0;
+static const uint8_t D1   = 1;
+static const uint8_t D2   = 2;
+static const uint8_t D3   = 3;
+static const uint8_t D4   = 4;
+static const uint8_t D5   = 5;
+static const uint8_t D6   = 6;
+static const uint8_t D7   = 7;
+static const uint8_t D8   = 8;
+static const uint8_t D9   = 9;
+static const uint8_t D10  = 10;
+static const uint8_t D11  = 11;
+static const uint8_t D12  = 12;
+static const uint8_t D13  = 13;
+static const uint8_t D14  = 14; // LED_BUILTIN
+static const uint8_t D15  = 15; // BLE_RESET
+static const uint8_t D16  = 16; // BLE_ENABLE
+static const uint8_t D17  = 17; // BLE_CONFIG
+static const uint8_t D18  = 18; // BLE_MSTR_SLV
+static const uint8_t D19  = 19; // BLE_STATE
+static const uint8_t D20  = 20; // I2S_SD0
+static const uint8_t D21  = 21; // I2S_SCK0
+static const uint8_t D22  = 22; // I2S_FS0
+static const uint8_t D23  = 23; // NC
+static const uint8_t D24  = 24; // NC
+
 
 /*
  * Analog pins
