@@ -1,6 +1,5 @@
 /*
   Copyright (c) 2015 Arduino LLC.  All right reserved.
-  SAMD51 support added by Adafruit - Copyright (c) 2018 Dean Miller for Adafruit Industries
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -27,9 +26,9 @@
 
 typedef uint8_t ep_t;
 
-class USBDevice_SAMD21G18x {
+class USBDevice_SAMR21G18x {
 public:
-	USBDevice_SAMD21G18x() : usb(USB->DEVICE) {
+	USBDevice_SAMR21G18x() : usb(USB->DEVICE) {
 		// Empty
 	}
 
@@ -40,18 +39,8 @@ public:
 	void reset();
 
 	// Enable
-	inline void enable()  { 
-		usb.CTRLA.bit.ENABLE = 1;
-#if defined(__SAMD51__)
-		while( usb.SYNCBUSY.reg & USB_SYNCBUSY_ENABLE ); //wait for sync
-#endif
-	}
-	inline void disable() { 
-		usb.CTRLA.bit.ENABLE = 0;
-#if defined(__SAMD51__)
-		while( usb.SYNCBUSY.reg & USB_SYNCBUSY_ENABLE ); //wait for sync
-#endif
-	}
+	inline void enable()  { usb.CTRLA.bit.ENABLE = 1; }
+	inline void disable() { usb.CTRLA.bit.ENABLE = 0; }
 
 	// USB mode (device/host)
 	inline void setUSBDeviceMode() { usb.CTRLA.bit.MODE = USB_CTRLA_MODE_DEVICE_Val; }
@@ -59,7 +48,6 @@ public:
 
 	inline void runInStandby()   { usb.CTRLA.bit.RUNSTDBY = 1; }
 	inline void noRunInStandby() { usb.CTRLA.bit.RUNSTDBY = 0; }
-	inline void wakeupHost()     { usb.CTRLB.bit.UPRSM = 1; }
 
 	// USB speed
 	inline void setFullSpeed()       { usb.CTRLB.bit.SPDCONF = USB_DEVICE_CTRLB_SPDCONF_FS_Val;   }
@@ -74,8 +62,8 @@ public:
 	// USB Interrupts
 	inline bool isEndOfResetInterrupt()        { return usb.INTFLAG.bit.EORST; }
 	inline void ackEndOfResetInterrupt()       { usb.INTFLAG.reg = USB_DEVICE_INTFLAG_EORST; }
-	inline void enableEndOfResetInterrupt()    { usb.INTENSET.bit.EORST = 1; }
-	inline void disableEndOfResetInterrupt()   { usb.INTENCLR.bit.EORST = 1; }
+	inline void enableEndOfResetInterrupt()    { usb.INTENSET.bit.EORST = 1; } 
+	inline void disableEndOfResetInterrupt()   { usb.INTENCLR.bit.EORST = 1; } 
 
 	inline bool isStartOfFrameInterrupt()      { return usb.INTFLAG.bit.SOF; }
 	inline void ackStartOfFrameInterrupt()     { usb.INTFLAG.reg = USB_DEVICE_INTFLAG_SOF; }
@@ -178,211 +166,32 @@ private:
 	__attribute__((__aligned__(4)))	UsbDeviceDescriptor EP[USB_EPT_NUM];
 };
 
-/*
- * Synchronization primitives.
- * TODO: Move into a separate header file and make an API out of it
- */
+void USBDevice_SAMR21G18x::reset() {
+	usb.CTRLA.bit.SWRST = 1;
+	memset(EP, 0, sizeof(EP));
+	while (usb.SYNCBUSY.bit.SWRST) {}
+	usb.DESCADD.reg = (uint32_t)(&EP);
+}
 
-class __Guard {
-public:
-	__Guard() : primask(__get_PRIMASK()), loops(1) {
-		__disable_irq();
-	}
-	~__Guard() {
-		if (primask == 0) {
-			__enable_irq();
-			// http://infocenter.arm.com/help/topic/com.arm.doc.dai0321a/BIHBFEIB.html
-			__ISB();
-		}
-	}
-	uint32_t enter() { return loops--; }
-private:
-	uint32_t primask;
-	uint32_t loops;
-};
+void USBDevice_SAMR21G18x::calibrate() {
+	// Load Pad Calibration data from non-volatile memory
+	uint32_t *pad_transn_p = (uint32_t *) USB_FUSES_TRANSN_ADDR;
+	uint32_t *pad_transp_p = (uint32_t *) USB_FUSES_TRANSP_ADDR;
+	uint32_t *pad_trim_p   = (uint32_t *) USB_FUSES_TRIM_ADDR;
 
-#define synchronized for (__Guard __guard; __guard.enter(); )
+	uint32_t pad_transn = (*pad_transn_p & USB_FUSES_TRANSN_Msk) >> USB_FUSES_TRANSN_Pos;
+	uint32_t pad_transp = (*pad_transp_p & USB_FUSES_TRANSP_Msk) >> USB_FUSES_TRANSP_Pos;
+	uint32_t pad_trim   = (*pad_trim_p   & USB_FUSES_TRIM_Msk  ) >> USB_FUSES_TRIM_Pos;
 
-/*
- * USB EP generic handlers.
- */
+	if (pad_transn == 0x1F)  // maximum value (31)
+		pad_transn = 5;
+	if (pad_transp == 0x1F)  // maximum value (31)
+		pad_transp = 29;
+	if (pad_trim == 0x7)     // maximum value (7)
+		pad_trim = 3;
 
-class EPHandler {
-public:
-	virtual void handleEndpoint() = 0;
-	virtual uint32_t recv(void *_data, uint32_t len) = 0;
-	virtual uint32_t available() const = 0;
+	usb.PADCAL.bit.TRANSN = pad_transn;
+	usb.PADCAL.bit.TRANSP = pad_transp;
+	usb.PADCAL.bit.TRIM   = pad_trim;
+}
 
-	virtual void init() = 0;
-};
-
-class DoubleBufferedEPOutHandler : public EPHandler {
-public:
-	DoubleBufferedEPOutHandler(USBDevice_SAMD21G18x &usbDev, uint32_t endPoint, uint32_t bufferSize) :
-		usbd(usbDev),
-		ep(endPoint), size(bufferSize),
-		current(0), incoming(0),
-		first0(0), last0(0), ready0(false),
-		first1(0), last1(0), ready1(false),
-		notify(false)
-	{
-		data0 = reinterpret_cast<uint8_t *>(malloc(size));
-		data1 = reinterpret_cast<uint8_t *>(malloc(size));
-
-		usbd.epBank0SetSize(ep, 64);
-		usbd.epBank0SetType(ep, 3); // BULK OUT
-
-		usbd.epBank0SetAddress(ep, const_cast<uint8_t *>(data0));
-
-		release();
-	}
-
-	~DoubleBufferedEPOutHandler() {
-		free((void*)data0);
-		free((void*)data1);
-	}
-	void init() {};
-
-	virtual uint32_t recv(void *_data, uint32_t len)
-	{
-		uint8_t *data = reinterpret_cast<uint8_t *>(_data);
-
-		// R/W: current, first0/1, ready0/1, notify
-		// R  : last0/1, data0/1
-		if (current == 0) {
-			synchronized {
-				if (!ready0) {
-					return 0;
-				}
-			}
-			// when ready0==true the buffer is not being filled and last0 is constant
-			uint32_t i;
-			for (i=0; i<len && first0 < last0; i++) {
-				data[i] = data0[first0++];
-			}
-			if (first0 == last0) {
-				first0 = 0;
-				current = 1;
-				synchronized {
-					ready0 = false;
-					if (notify) {
-						notify = false;
-						release();
-					}
-				}
-			}
-			return i;
-		} else {
-			synchronized {
-				if (!ready1) {
-					return 0;
-				}
-			}
-			// when ready1==true the buffer is not being filled and last1 is constant
-			uint32_t i;
-			for (i=0; i<len && first1 < last1; i++) {
-				data[i] = data1[first1++];
-			}
-			if (first1 == last1) {
-				first1 = 0;
-				current = 0;
-				synchronized {
-					ready1 = false;
-					if (notify) {
-						notify = false;
-						release();
-					}
-				}
-			}
-			return i;
-		}
-	}
-
-	virtual void handleEndpoint()
-	{
-		// R/W : incoming, ready0/1
-		//   W : last0/1, notify
-		if (usbd.epBank0IsTransferComplete(ep))
-		{
-			// Ack Transfer complete
-			usbd.epBank0AckTransferComplete(ep);
-			//usbd.epBank0AckTransferFailed(ep); // XXX
-
-			// Update counters and swap banks for non-ZLP's
-			if (incoming == 0) {
-				last0 = usbd.epBank0ByteCount(ep);
-				if (last0 != 0) {
-					incoming = 1;
-					usbd.epBank0SetAddress(ep, const_cast<uint8_t *>(data1));
-					synchronized {
-						ready0 = true;
-						if (ready1) {
-							notify = true;
-							return;
-						}
-						notify = false;
-					}
-				}
-			} else {
-				last1 = usbd.epBank0ByteCount(ep);
-				if (last1 != 0) {
-					incoming = 0;
-					usbd.epBank0SetAddress(ep, const_cast<uint8_t *>(data0));
-					synchronized {
-						ready1 = true;
-						if (ready0) {
-							notify = true;
-							return;
-						}
-						notify = false;
-					}
-				}
-			}
-			release();
-		}
-	}
-
-	// Returns how many bytes are stored in the buffers
-	virtual uint32_t available() const {
-		if (current == 0) {
-			bool ready = false;
-			synchronized {
-				ready = ready0;
-			}
-			return ready ? (last0 - first0) : 0;
-		} else {
-			bool ready = false;
-			synchronized {
-				ready = ready1;
-			}
-			return ready ? (last1 - first1) : 0;
-		}
-	}
-
-	void release() {
-		// Release OUT EP
-		usbd.epBank0EnableTransferComplete(ep);
-		usbd.epBank0SetMultiPacketSize(ep, size);
-		usbd.epBank0SetByteCount(ep, 0);
-		usbd.epBank0ResetReady(ep);
-	}
-
-private:
-	USBDevice_SAMD21G18x &usbd;
-
-	const uint32_t ep;
-	const uint32_t size;
-	uint32_t current, incoming;
-
-	volatile uint8_t *data0;
-	uint32_t first0;
-	volatile uint32_t last0;
-	volatile bool ready0;
-
-	volatile uint8_t *data1;
-	uint32_t first1;
-	volatile uint32_t last1;
-	volatile bool ready1;
-
-	volatile bool notify;
-};
