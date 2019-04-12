@@ -240,7 +240,7 @@ static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only
  */
 #define WIRE_INTERFACES_COUNT 2
 
-// Primary I2S pins (I2C, EXTERNAL)
+// Primary I2C pins (I2C, EXTERNAL)
 #define PIN_WIRE_SDA         (45u)
 #define PIN_WIRE_SCL         (46u)
 #define PERIPH_WIRE          sercom4
@@ -250,7 +250,7 @@ static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
 
-// Secondary I2S pins (I2C1, INTERNAL)
+// Secondary I2C pins (I2C1, INTERNAL)
 #define PIN_WIRE1_SDA         (47u)
 #define PIN_WIRE1_SCL         (48u)
 #define PERIPH_WIRE1          sercom3
