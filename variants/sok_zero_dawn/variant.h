@@ -85,6 +85,7 @@ extern "C"
 #define BLE_STATE    (19u)
 
 #define PIN_NOT_CONNECTED (24u)
+
 // LEDs
 #define PIN_LED_13           (14u)
 #define PIN_LED_RXL          PIN_NOT_CONNECTED // -- unused
@@ -188,8 +189,8 @@ static const uint8_t ATN =  PIN_ATN;
 #define PAD_SERIAL1_RX       (SERCOM_RX_PAD_1)
 
 // SerialBLE (BLE_HJ580XP)
-#define PIN_SERIAL_BLE_TX    (45ul)
-#define PIN_SERIAL_BLE_RX    (46ul)
+#define PIN_SERIAL_BLE_TX    (57ul)
+#define PIN_SERIAL_BLE_RX    (58ul)
 #define PAD_SERIAL_BLE_TX    (UART_TX_PAD_2)
 #define PAD_SERIAL_BLE_RX    (SERCOM_RX_PAD_3)
 
