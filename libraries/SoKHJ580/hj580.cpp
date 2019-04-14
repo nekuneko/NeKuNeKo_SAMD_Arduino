@@ -7,22 +7,32 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	this->baudRate = baud;
 	this->uart     = u;
 
-
-	this->uart->begin(19200);
-	while(!uart);
-
 	// BLE: Pin initialization
-	pinMode(BLE_RESET,     OUTPUT);   // HIGH - Reset,        LOW  - System ON 
-	pinMode(BLE_CONFIG,    OUTPUT);   // LOW  - AT-Commands,  HIGH - Transparent UART mode
-	
+	pinMode(BLE_RESET,  	OUTPUT);   		// HIGH: System Reset,        	LOW: System ON 
+	pinMode(BLE_ENABLE,		OUTPUT);		// HIGH: Uart RX disabled, 		LOW: Uart RX enabled
+	pinMode(BLE_CONFIG, 	OUTPUT);   		// HIGH: Transparent UART mode,	LOW: AT-Commands
+	pinMode(BLE_MSTR_SLV, 	OUTPUT);		// HIGH: Slave mode, 			LOW: Master mode
+	pinMode(BLE_STATE, 		INPUT_PULLUP);	// HIGH: BLE disconencted, 		LOW: BLE connected to host/peripheral
+
+	digitalWrite(BLE_RESET, 	HIGH);		// System Reset
+	digitalWrite(BLE_ENABLE, 	LOW);		// Uart RX enabled
+	digitalWrite(BLE_CONFIG, 	LOW);		// Transparent UART mode
+	digitalWrite(BLE_MSTR_SLV, 	HIGH);		// Slave mode
+
+	// Reset configurations
 	reset();
 
 	// BLE Initial Configuration
-	String commands[5] = { "NAME"+String("SoK Zero"), "SOFT"+softVersion, "FAC"+String("NeKuNeKo Inc."),  "BAUD"+String(baudRate), "DISCONNECT"};
-	writeCommands(commands, 5);
+	this->uart->begin(19200);
+
+	String commands[5] = { 	"NAME"+String("SoK"), 
+							"SOFT"+softVersion, 
+							"FAC" +String("NeKuNeKo Inc."), 
+							"BAUD"+String(baudRate), 
+							"DISCONNECT"};
+	success = writeCommands(commands, 5);
 
 	this->uart->begin(baudRate);
-	while(!uart);
 	
 	return success;
 }
@@ -30,8 +40,9 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 void HJ580::reset (unsigned long timeReset)
 {
 	digitalWrite(BLE_RESET, HIGH);    delay(timeReset); // Perform Reset
-    digitalWrite(BLE_RESET, LOW);     //delay(150); // Release reset, System ON in AT COMMAND mode.
+    digitalWrite(BLE_RESET, LOW);     //delay(150); 	// Release reset, System ON in AT COMMAND mode.
 }
+
 
 
 
@@ -43,7 +54,6 @@ String HJ580::readCommand (unsigned long timeout)
 
 
 
-
 bool HJ580::writeCommands (String* commands, int size)
 {
 	String response = "";
@@ -51,21 +61,17 @@ bool HJ580::writeCommands (String* commands, int size)
 	bool   success  = true;
 
 	atmodeON(); // Enter AT Command mode
-
 	for (int i=0; i<=size-1; ++i)
 	{
 		command = "<"+commands[i]+">";
-		this->uart->write(command.c_str());		// Send AT Command
-		response = readCommand(); 				// Receive Acknowledgement
+		this->uart->write(command.c_str());	// Send AT Command
+		response = readCommand(); 			// Receive Acknowledgement
 
-		// Erase characters '<' & '>'
-		response.substring(1, response.length()-1);
-		
+		success &= checkResponse(response);
+
 		// Debug
 		Serial.print(command + ": ");
 		Serial.println(response);	
-
-		success &= checkResponse(response);
 	}
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
@@ -80,15 +86,12 @@ String HJ580::writeCommand (String command)
 	atmodeON(); // Enter AT Command mode
 	
 	command = "<"+command+">";
-	this->uart->write(command.c_str());  	// Send AT Command
-	response = readCommand(); 				// Receive Acknowledgement
-
-	// Erase characters '<' & '>'
-	response.substring(1, response.length()-1);
+	this->uart->write(command.c_str()); // Send AT Command
+	response = readCommand(); 			// Receive Acknowledgement
 
 	// Debug
-	Serial.print(command + ": ");
-	Serial.println(response);	
+	//Serial.print(command + ": ");
+	//Serial.println(response);	
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
 
@@ -98,8 +101,12 @@ String HJ580::writeCommand (String command)
 
 bool HJ580::checkResponse (String response)
 {
-	if (response.equalsIgnoreCase("OK") || 
-		response.equalsIgnoreCase("CONNECTED"))
+	// Erase characters '<' & '>'
+	//response.substring(1, response.length()-1);
+
+	if (response.equalsIgnoreCase("<OK>") || 
+		response.equalsIgnoreCase("<CONNECTED>") ||
+		response.equalsIgnoreCase("<DISCONNECTED>"))
 	  return true;
 	else 
 	  return false; 
