@@ -82,7 +82,7 @@ typedef enum _ETCChannel
   TC4_CH1  = (4<<8)|(1),
   TC5_CH0  = (5<<8)|(0),
   TC5_CH1  = (5<<8)|(1),
-#if defined __SAMD21J18A__
+#if defined (__SAMD21J18A__) || defined (__SAMD51__) // Neku Was Here! Added in order to use TC6 & TC7
   TC6_CH0  = (6<<8)|(0),
   TC6_CH1  = (6<<8)|(1),
   TC7_CH0  = (7<<8)|(0),

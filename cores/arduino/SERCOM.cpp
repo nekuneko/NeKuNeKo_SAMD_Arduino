@@ -1,5 +1,6 @@
 /*
   Copyright (c) 2014 Arduino.  All right reserved.
+  SAMD51 support added by Adafruit - Copyright (c) 2018 Dean Miller for Adafruit Industries
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -18,6 +19,7 @@
 
 #include "SERCOM.h"
 #include "variant.h"
+#include "Arduino.h"
 
 #ifndef WIRE_RISE_TIME_NANOSECONDS
 // Default rise time in nanoseconds, based on 4.7K ohm pull up resistors
@@ -30,9 +32,9 @@ SERCOM::SERCOM(Sercom* s)
   sercom = s;
 }
 
-/* 	=========================
- *	===== Sercom UART
- *	=========================
+/* =========================
+ * ===== Sercom UART
+ * =========================
 */
 void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint32_t baudrate)
 {
@@ -40,12 +42,12 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
   resetUART();
 
   //Setting the CTRLA register
-  sercom->USART.CTRLA.reg =	SERCOM_USART_CTRLA_MODE(mode) |
-                SERCOM_USART_CTRLA_SAMPR(sampleRate);
+  sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE(mode) |
+                            SERCOM_USART_CTRLA_SAMPR(sampleRate);
 
   //Setting the Interrupt register
-  sercom->USART.INTENSET.reg =	SERCOM_USART_INTENSET_RXC |  //Received complete
-                                SERCOM_USART_INTENSET_ERROR; //All others errors
+  sercom->USART.INTENSET.reg = SERCOM_USART_INTENSET_RXC |  //Received complete
+                               SERCOM_USART_INTENSET_ERROR; //All others errors
 
   if ( mode == UART_INT_CLOCK )
   {
@@ -60,7 +62,11 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
     // Asynchronous fractional mode (Table 24-2 in datasheet)
     //   BAUD = fref / (sampleRateValue * fbaud)
     // (multiply by 8, to calculate fractional piece)
+#if defined(__SAMD51__)
+    uint32_t baudTimes8 = (SERCOM_FREQ_REF * 8) / (sampleRateValue * baudrate);
+#else
     uint32_t baudTimes8 = (SystemCoreClock * 8) / (sampleRateValue * baudrate);
+#endif
 
     sercom->USART.BAUD.FRAC.FP   = (baudTimes8 % 8);
     sercom->USART.BAUD.FRAC.BAUD = (baudTimes8 / 8);
@@ -69,20 +75,22 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
 void SERCOM::initFrame(SercomUartCharSize charSize, SercomDataOrder dataOrder, SercomParityMode parityMode, SercomNumberStopBit nbStopBits)
 {
   //Setting the CTRLA register
-  sercom->USART.CTRLA.reg |=	SERCOM_USART_CTRLA_FORM( (parityMode == SERCOM_NO_PARITY ? 0 : 1) ) |
-                dataOrder << SERCOM_USART_CTRLA_DORD_Pos;
+  sercom->USART.CTRLA.reg |=
+    SERCOM_USART_CTRLA_FORM((parityMode == SERCOM_NO_PARITY ? 0 : 1) ) |
+    dataOrder << SERCOM_USART_CTRLA_DORD_Pos;
 
   //Setting the CTRLB register
-  sercom->USART.CTRLB.reg |=	SERCOM_USART_CTRLB_CHSIZE(charSize) |
-                nbStopBits << SERCOM_USART_CTRLB_SBMODE_Pos |
-                (parityMode == SERCOM_NO_PARITY ? 0 : parityMode) << SERCOM_USART_CTRLB_PMODE_Pos; //If no parity use default value
+  sercom->USART.CTRLB.reg |= SERCOM_USART_CTRLB_CHSIZE(charSize) |
+    nbStopBits << SERCOM_USART_CTRLB_SBMODE_Pos |
+    (parityMode == SERCOM_NO_PARITY ? 0 : parityMode) <<
+      SERCOM_USART_CTRLB_PMODE_Pos; //If no parity use default value
 }
 
 void SERCOM::initPads(SercomUartTXPad txPad, SercomRXPad rxPad)
 {
   //Setting the CTRLA register
-  sercom->USART.CTRLA.reg |=	SERCOM_USART_CTRLA_TXPO(txPad) |
-                SERCOM_USART_CTRLA_RXPO(rxPad);
+  sercom->USART.CTRLA.reg |= SERCOM_USART_CTRLA_TXPO(txPad) |
+                             SERCOM_USART_CTRLA_RXPO(rxPad);
 
   // Enable Transceiver and Receiver
   sercom->USART.CTRLB.reg |= SERCOM_USART_CTRLB_TXEN | SERCOM_USART_CTRLB_RXEN ;
@@ -152,6 +160,12 @@ bool SERCOM::isFrameErrorUART()
   return sercom->USART.STATUS.bit.FERR;
 }
 
+void SERCOM::clearFrameErrorUART()
+{
+  // clear FERR bit writing 1 status bit
+  sercom->USART.STATUS.bit.FERR = 1;
+}
+
 bool SERCOM::isParityErrorUART()
 {
   //PERR : Parity Error
@@ -189,26 +203,33 @@ void SERCOM::disableDataRegisterEmptyInterruptUART()
   sercom->USART.INTENCLR.reg = SERCOM_USART_INTENCLR_DRE;
 }
 
-/*	=========================
- *	===== Sercom SPI
- *	=========================
+/* =========================
+ * ===== Sercom SPI
+ * =========================
 */
 void SERCOM::initSPI(SercomSpiTXPad mosi, SercomRXPad miso, SercomSpiCharSize charSize, SercomDataOrder dataOrder)
 {
   resetSPI();
   initClockNVIC();
 
-  //Setting the CTRLA register
-  sercom->SPI.CTRLA.reg =	SERCOM_SPI_CTRLA_MODE_SPI_MASTER |
+#if defined(__SAMD51__)
+  sercom->SPI.CTRLA.reg = SERCOM_SPI_CTRLA_MODE(0x3)  |  // master mode
                           SERCOM_SPI_CTRLA_DOPO(mosi) |
                           SERCOM_SPI_CTRLA_DIPO(miso) |
                           dataOrder << SERCOM_SPI_CTRLA_DORD_Pos;
+#else
+  //Setting the CTRLA register
+  sercom->SPI.CTRLA.reg = SERCOM_SPI_CTRLA_MODE_SPI_MASTER |
+                          SERCOM_SPI_CTRLA_DOPO(mosi) |
+                          SERCOM_SPI_CTRLA_DIPO(miso) |
+                          dataOrder << SERCOM_SPI_CTRLA_DORD_Pos;
+#endif
 
   //Setting the CTRLB register
   sercom->SPI.CTRLB.reg = SERCOM_SPI_CTRLB_CHSIZE(charSize) |
-                          SERCOM_SPI_CTRLB_RXEN;	//Active the SPI receiver.
+                          SERCOM_SPI_CTRLB_RXEN; //Active the SPI receiver.
 
-
+  while( sercom->SPI.SYNCBUSY.bit.CTRLB == 1 );
 }
 
 void SERCOM::initSPIClock(SercomSpiClockMode clockMode, uint32_t baudrate)
@@ -227,8 +248,8 @@ void SERCOM::initSPIClock(SercomSpiClockMode clockMode, uint32_t baudrate)
     cpol = 1;
 
   //Setting the CTRLA register
-  sercom->SPI.CTRLA.reg |=	( cpha << SERCOM_SPI_CTRLA_CPHA_Pos ) |
-                            ( cpol << SERCOM_SPI_CTRLA_CPOL_Pos );
+  sercom->SPI.CTRLA.reg |= ( cpha << SERCOM_SPI_CTRLA_CPHA_Pos ) |
+                           ( cpol << SERCOM_SPI_CTRLA_CPOL_Pos );
 
   //Synchronous arithmetic
   sercom->SPI.BAUD.reg = calculateBaudrateSynchronous(baudrate);
@@ -282,14 +303,9 @@ SercomDataOrder SERCOM::getDataOrderSPI()
 
 void SERCOM::setBaudrateSPI(uint8_t divider)
 {
-  //Can't divide by 0
-  if(divider == 0)
-    return;
+  disableSPI(); // Register is enable-protected
 
-  //Register enable-protected
-  disableSPI();
-
-  sercom->SPI.BAUD.reg = calculateBaudrateSynchronous( SERCOM_FREQ_REF / divider );
+  sercom->SPI.BAUD.reg = calculateBaudrateSynchronous(SERCOM_SPI_FREQ_REF / divider);
 
   enableSPI();
 }
@@ -320,10 +336,7 @@ uint8_t SERCOM::transferDataSPI(uint8_t data)
 {
   sercom->SPI.DATA.bit.DATA = data; // Writing data into Data register
 
-  while( sercom->SPI.INTFLAG.bit.RXC == 0 )
-  {
-    // Waiting Complete Reception
-  }
+  while(sercom->SPI.INTFLAG.bit.RXC == 0); // Waiting Complete Reception
 
   return sercom->SPI.DATA.bit.DATA;  // Reading data
 }
@@ -341,25 +354,27 @@ bool SERCOM::isDataRegisterEmptySPI()
 
 //bool SERCOM::isTransmitCompleteSPI()
 //{
-//	//TXC : Transmit complete
-//	return sercom->SPI.INTFLAG.bit.TXC;
+//  //TXC : Transmit complete
+//  return sercom->SPI.INTFLAG.bit.TXC;
 //}
 //
 //bool SERCOM::isReceiveCompleteSPI()
 //{
-//	//RXC : Receive complete
-//	return sercom->SPI.INTFLAG.bit.RXC;
+//  //RXC : Receive complete
+//  return sercom->SPI.INTFLAG.bit.RXC;
 //}
 
 uint8_t SERCOM::calculateBaudrateSynchronous(uint32_t baudrate)
 {
-  return SERCOM_FREQ_REF / (2 * baudrate) - 1;
+  uint16_t b = SERCOM_SPI_FREQ_REF / (2 * baudrate);
+  if(b > 0) b--; // Don't -1 on baud calc if already at 0
+  return b;
 }
 
 
-/*	=========================
- *	===== Sercom WIRE
- *	=========================
+/* =========================
+ * ===== Sercom WIRE
+ * =========================
  */
 void SERCOM::resetWIRE()
 {
@@ -451,7 +466,11 @@ void SERCOM::initMasterWIRE( uint32_t baudrate )
 //  sercom->I2CM.INTENSET.reg = SERCOM_I2CM_INTENSET_MB | SERCOM_I2CM_INTENSET_SB | SERCOM_I2CM_INTENSET_ERROR ;
 
   // Synchronous arithmetic baudrate
+#if defined(__SAMD51__)
+  sercom->I2CM.BAUD.bit.BAUD = SERCOM_FREQ_REF / ( 2 * baudrate) - 1 ;
+#else
   sercom->I2CM.BAUD.bit.BAUD = SystemCoreClock / ( 2 * baudrate) - 5 - (((SystemCoreClock / 1000000) * WIRE_RISE_TIME_NANOSECONDS) / (2 * 1000));
+#endif
 }
 
 void SERCOM::prepareNackBitWIRE( void )
@@ -494,7 +513,7 @@ bool SERCOM::startTransmissionWIRE(uint8_t address, SercomWireReadWriteFlag flag
   address = (address << 0x1ul) | flag;
 
   // Wait idle or owner bus mode
-  while ( !isBusIdleWIRE() && !isBusOwnerWIRE() );
+   while ( !isBusIdleWIRE() && !isBusOwnerWIRE() );
 
   // Send start and address
   sercom->I2CM.ADDR.bit.ADDR = address;
@@ -648,61 +667,168 @@ uint8_t SERCOM::readDataWIRE( void )
 
 void SERCOM::initClockNVIC( void )
 {
-  uint8_t clockId = 0;
+#if defined(__SAMD51__)
+  uint32_t  clk_core, clk_slow;
+  IRQn_Type irq0, irq1, irq2, irq3;
+
+  if(sercom == SERCOM0) {
+    clk_core = SERCOM0_GCLK_ID_CORE;
+    clk_slow = SERCOM0_GCLK_ID_SLOW;
+    irq0     = SERCOM0_0_IRQn;
+    irq1     = SERCOM0_1_IRQn;
+    irq2     = SERCOM0_2_IRQn;
+    irq3     = SERCOM0_3_IRQn;
+  } else if(sercom == SERCOM1) {
+    clk_core = SERCOM1_GCLK_ID_CORE;
+    clk_slow = SERCOM1_GCLK_ID_SLOW;
+    irq0     = SERCOM1_0_IRQn;
+    irq1     = SERCOM1_1_IRQn;
+    irq2     = SERCOM1_2_IRQn;
+    irq3     = SERCOM1_3_IRQn;
+  } else if(sercom == SERCOM2) {
+    clk_core = SERCOM2_GCLK_ID_CORE;
+    clk_slow = SERCOM2_GCLK_ID_SLOW;
+    irq0     = SERCOM2_0_IRQn;
+    irq1     = SERCOM2_1_IRQn;
+    irq2     = SERCOM2_2_IRQn;
+    irq3     = SERCOM2_3_IRQn;
+  } else if(sercom == SERCOM3) {
+    clk_core = SERCOM3_GCLK_ID_CORE;
+    clk_slow = SERCOM3_GCLK_ID_SLOW;
+    irq0     = SERCOM3_0_IRQn;
+    irq1     = SERCOM3_1_IRQn;
+    irq2     = SERCOM3_2_IRQn;
+    irq3     = SERCOM3_3_IRQn;
+  } else if(sercom == SERCOM4) {
+    clk_core = SERCOM4_GCLK_ID_CORE;
+    clk_slow = SERCOM4_GCLK_ID_SLOW;
+    irq0     = SERCOM4_0_IRQn;
+    irq1     = SERCOM4_1_IRQn;
+    irq2     = SERCOM4_2_IRQn;
+    irq3     = SERCOM4_3_IRQn;
+  } else if(sercom == SERCOM5) {
+    clk_core = SERCOM5_GCLK_ID_CORE;
+    clk_slow = SERCOM5_GCLK_ID_SLOW;
+    irq0     = SERCOM5_0_IRQn;
+    irq1     = SERCOM5_1_IRQn;
+    irq2     = SERCOM5_2_IRQn;
+    irq3     = SERCOM5_3_IRQn;
+  }
+ #if defined SERCOM6
+  else if(sercom == SERCOM6) {
+    clk_core = SERCOM6_GCLK_ID_CORE;
+    clk_slow = SERCOM6_GCLK_ID_SLOW;
+    irq0     = (SERCOM6_0_IRQn);
+    irq1     = (SERCOM6_1_IRQn);
+    irq2     = (SERCOM6_2_IRQn);
+    irq3     = (SERCOM6_3_IRQn);
+  }
+ #endif // end SERCOM6
+ #if defined SERCOM7
+  else if(sercom == SERCOM7) {
+    clk_core = SERCOM7_GCLK_ID_CORE;
+    clk_slow = SERCOM7_GCLK_ID_SLOW;
+    irq0     = (SERCOM7_0_IRQn);
+    irq1     = (SERCOM7_1_IRQn);
+    irq2     = (SERCOM7_2_IRQn);
+    irq3     = (SERCOM7_3_IRQn);
+  }
+ #endif // end SERCOM7
+  NVIC_ClearPendingIRQ(irq0);
+  NVIC_ClearPendingIRQ(irq1);
+  NVIC_ClearPendingIRQ(irq2);
+  NVIC_ClearPendingIRQ(irq3);
+
+  NVIC_SetPriority(irq0, (1<<__NVIC_PRIO_BITS) - 1);
+  NVIC_SetPriority(irq1, (1<<__NVIC_PRIO_BITS) - 1);
+  NVIC_SetPriority(irq2, (1<<__NVIC_PRIO_BITS) - 1);
+  NVIC_SetPriority(irq3, (1<<__NVIC_PRIO_BITS) - 1);
+
+  NVIC_EnableIRQ(irq0);
+  NVIC_EnableIRQ(irq1);
+  NVIC_EnableIRQ(irq2);
+  NVIC_EnableIRQ(irq3);
+
+  GCLK->PCHCTRL[clk_core].bit.CHEN = 0;     // Disable core timer
+  while(GCLK->PCHCTRL[clk_core].bit.CHEN);  // Wait for disable
+  GCLK->PCHCTRL[clk_slow].bit.CHEN = 0;     // Disable slow timer
+  while(GCLK->PCHCTRL[clk_slow].bit.CHEN);  // Wait for disable
+
+  // SPI DMA speed is dictated by the "slow clock," so BOTH are set to the
+  // same clock source (clk_slow isn't sourced from XOSC32K as before).
+  // This might have power implications for sleep code.
+  // From cores/arduino/startup.c:
+  // GCLK0 = F_CPU
+  // GCLK1 = 48 MHz
+  // GCLK2 = 100 MHz
+  // GCLK3 = XOSC32K
+  // GCLK4 = 12 MHz
+ #if SERCOM_SPI_FREQ_REF == 48000000 // 48 MHz clock = GCLK1
+  GCLK->PCHCTRL[clk_core].reg = GCLK_PCHCTRL_GEN_GCLK1_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+  GCLK->PCHCTRL[clk_slow].reg = GCLK_PCHCTRL_GEN_GCLK1_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+ #elif SERCOM_SPI_FREQ_REF == 100000000 // 100 MHz clock = GCLK2
+  GCLK->PCHCTRL[clk_core].reg = GCLK_PCHCTRL_GEN_GCLK2_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+  GCLK->PCHCTRL[clk_slow].reg = GCLK_PCHCTRL_GEN_GCLK2_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+ #elif SERCOM_SPI_FREQ_REF == F_CPU // F_CPU clock = GCLK0
+  GCLK->PCHCTRL[clk_core].reg = GCLK_PCHCTRL_GEN_GCLK0_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+  GCLK->PCHCTRL[clk_slow].reg = GCLK_PCHCTRL_GEN_GCLK0_Val |
+                                (1 << GCLK_PCHCTRL_CHEN_Pos);
+ #endif
+
+  while(!GCLK->PCHCTRL[clk_core].bit.CHEN); // Wait for core clock enable
+  while(!GCLK->PCHCTRL[clk_slow].bit.CHEN); // Wait for slow clock enable
+
+#else // end if SAMD51
+
   IRQn_Type IdNvic=PendSV_IRQn ; // Dummy init to intercept potential error later
 
-  if(sercom == SERCOM0)
-  {
+  uint8_t clockId = 0;
+  if(sercom == SERCOM0) {
     clockId = GCM_SERCOM0_CORE;
-    IdNvic = SERCOM0_IRQn;
-  }
-  else if(sercom == SERCOM1)
-  {
+    IdNvic  = SERCOM0_IRQn;
+  } else if(sercom == SERCOM1) {
     clockId = GCM_SERCOM1_CORE;
-    IdNvic = SERCOM1_IRQn;
-  }
-  else if(sercom == SERCOM2)
-  {
+    IdNvic  = SERCOM1_IRQn;
+  } else if(sercom == SERCOM2) {
     clockId = GCM_SERCOM2_CORE;
-    IdNvic = SERCOM2_IRQn;
-  }
-  else if(sercom == SERCOM3)
-  {
+    IdNvic  = SERCOM2_IRQn;
+  } else if(sercom == SERCOM3) {
     clockId = GCM_SERCOM3_CORE;
-    IdNvic = SERCOM3_IRQn;
+    IdNvic  = SERCOM3_IRQn;
   }
-  #if defined(SERCOM4)
-  else if(sercom == SERCOM4)
-  {
+ #if defined(SERCOM4)
+  else if(sercom == SERCOM4) {
     clockId = GCM_SERCOM4_CORE;
-    IdNvic = SERCOM4_IRQn;
+    IdNvic  = SERCOM4_IRQn;
   }
-  #endif // SERCOM4
-  #if defined(SERCOM5)
-  else if(sercom == SERCOM5)
-  {
+ #endif // end SERCOM4
+ #if defined(SERCOM5)
+  else if(sercom == SERCOM5) {
     clockId = GCM_SERCOM5_CORE;
-    IdNvic = SERCOM5_IRQn;
+    IdNvic  = SERCOM5_IRQn;
   }
-  #endif // SERCOM5
+ #endif // end SERCOM5
 
-  if ( IdNvic == PendSV_IRQn )
-  {
-    // We got a problem here
-    return ;
+  if(IdNvic == PendSV_IRQn) {
+    return; // We got a problem here
   }
 
-  // Setting NVIC
+    // Setting NVIC
+  NVIC_ClearPendingIRQ(IdNvic);
+  NVIC_SetPriority (IdNvic, (1<<__NVIC_PRIO_BITS) - 1);
   NVIC_EnableIRQ(IdNvic);
-  NVIC_SetPriority (IdNvic, SERCOM_NVIC_PRIORITY);  /* set Priority */
 
-  //Setting clock
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( clockId ) | // Generic Clock 0 (SERCOMx)
-                      GCLK_CLKCTRL_GEN_GCLK0 | // Generic Clock Generator 0 is source
-                      GCLK_CLKCTRL_CLKEN ;
+  // Setting clock
+  GCLK->CLKCTRL.reg =
+    GCLK_CLKCTRL_ID( clockId ) | // Generic Clock 0 (SERCOMx)
+    GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
+    GCLK_CLKCTRL_CLKEN;
 
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY )
-  {
-    /* Wait for synchronization */
-  }
+  while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY); // Wait for synchronization
+#endif // end !SAMD51
 }
