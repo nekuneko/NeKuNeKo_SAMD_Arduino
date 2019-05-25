@@ -11,7 +11,7 @@ extern HJ580 ble;
 // BLE_CONFIG   -> PIN*
 // BLE_MSTR_SLV -> PIN
 // BLE_STATE    -> PIN
-// SerialBLE
+// Serial2
 
 #ifdef _VARIANT_GONTAK_SOK_ZERO_
   #define BLE_ENABLE    PIN_NOT_CONNECTED
@@ -26,7 +26,7 @@ class HJ580
 {
 public:
 
-  bool begin (String softVersion = " ", unsigned long baud = 115200, Uart* u = &SerialBLE);
+  bool begin (String softVersion = " ", unsigned long baud = 115200, Uart* u = &Serial2);
 
 
   void reset (unsigned long timeReset = 50);
