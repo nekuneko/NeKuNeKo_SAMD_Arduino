@@ -188,11 +188,11 @@ static const uint8_t ATN =  PIN_ATN;
 #define PAD_SERIAL1_TX       (UART_TX_PAD_0)
 #define PAD_SERIAL1_RX       (SERCOM_RX_PAD_1)
 
-// SerialBLE (BLE_HJ580XP)
-#define PIN_SERIAL_BLE_TX    (57ul)
-#define PIN_SERIAL_BLE_RX    (58ul)
-#define PAD_SERIAL_BLE_TX    (UART_TX_PAD_2)
-#define PAD_SERIAL_BLE_RX    (SERCOM_RX_PAD_3)
+// Serial2 (Bluetooth BLE_HJ580XP or WiFi)
+#define PIN_SERIAL2_TX    (57ul)
+#define PIN_SERIAL2_RX    (58ul)
+#define PAD_SERIAL2_TX    (UART_TX_PAD_2)
+#define PAD_SERIAL2_RX    (SERCOM_RX_PAD_3)
 
 /*
  * SPI Interfaces
@@ -301,7 +301,7 @@ extern SERCOM sercom4;
 extern SERCOM sercom5;
 
 extern Uart Serial1;
-extern Uart SerialBLE;
+extern Uart Serial2;
 
 #endif
 
@@ -323,7 +323,7 @@ extern Uart SerialBLE;
 #define SERIAL_PORT_USBVIRTUAL      Serial
 #define SERIAL_PORT_MONITOR         Serial
 
-#define SERIAL_PORT_HARDWARE        SerialBLE
+#define SERIAL_PORT_HARDWARE        Serial2
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 
 
