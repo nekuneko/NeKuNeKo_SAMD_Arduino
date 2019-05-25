@@ -105,7 +105,7 @@ void SPIClass::usingInterrupt(int interruptNumber)
   else
   {
     interruptMode |= SPI_IMODE_EXTINT;
-    interruptMask |= (1 << interruptNumber);
+    interruptMask |= (1 << g_APinDescription[interruptNumber].ulExtInt);
   }
 
   if (irestore)
@@ -123,7 +123,7 @@ void SPIClass::notUsingInterrupt(int interruptNumber)
   uint8_t irestore = interruptsStatus();
   noInterrupts();
 
-  interruptMask &= ~(1 << interruptNumber);
+  interruptMask &= ~(1 << g_APinDescription[interruptNumber].ulExtInt);
 
   if (interruptMask == 0)
     interruptMode = SPI_IMODE_NONE;
@@ -198,7 +198,7 @@ void SPIClass::setDataMode(uint8_t mode)
 
 void SPIClass::setClockDivider(uint8_t div)
 {
-  if (div < SPI_MIN_CLOCK_DIVIDER) {
+  if(div < SPI_MIN_CLOCK_DIVIDER) {
     _p_sercom->setBaudrateSPI(SPI_MIN_CLOCK_DIVIDER);
   } else {
     _p_sercom->setBaudrateSPI(div);
