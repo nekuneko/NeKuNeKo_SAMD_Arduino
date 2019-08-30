@@ -54,7 +54,7 @@ extern "C"
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (44u)
+#define PINS_COUNT           (45u)
 #define NUM_DIGITAL_PINS     (24u)
 #define NUM_ANALOG_INPUTS    (20u)
 #define NUM_ANALOG_OUTPUTS   (1u)
@@ -77,6 +77,10 @@ extern "C"
  */
 // #define digitalPinToTimer(P)
 
+
+// Pin not defined
+#define PIN_NOT_CONNECTED   (60u)
+
 // BLE control pins
 #define BLE_RESET    (15u)
 #define BLE_ENABLE   (16u)
@@ -84,7 +88,8 @@ extern "C"
 #define BLE_MSTR_SLV (18u)
 #define BLE_STATE    (19u)
 
-#define PIN_NOT_CONNECTED (24u)
+// APDS Interupt
+#define INT_APDS     (24u)
 
 // LEDs
 #define PIN_LED_13           (14u)
@@ -145,7 +150,8 @@ static const uint8_t D24  = 24; // NC
 #define PIN_A17              (PIN_A0 + 17)
 #define PIN_A18              (PIN_A0 + 18)
 #define PIN_A19              (PIN_A0 + 19)
-#define PIN_DAC0             (60u)
+
+#define PIN_DAC0             PIN_A4
 
 static const uint8_t A0   = PIN_A0;
 static const uint8_t A1   = PIN_A1;
@@ -177,22 +183,28 @@ static const uint8_t DAC0 = PIN_DAC0;
 #define PIN_ATN             PIN_NOT_CONNECTED   // -- unsed, arduino zero default is on 38ul, PA13
 static const uint8_t ATN =  PIN_ATN;
 
-#define PIN_USB_HOST_ENABLE PIN_NOT_CONNECTED   // -- unused
 
 /*
  * Serial interfaces
  */
 // Serial1 (D0/D1)
-#define PIN_SERIAL1_TX       (0ul)
-#define PIN_SERIAL1_RX       (1ul)
-#define PAD_SERIAL1_TX       (UART_TX_PAD_0)
-#define PAD_SERIAL1_RX       (SERCOM_RX_PAD_1)
+#define PIN_SERIAL1_TX      (0ul)
+#define PIN_SERIAL1_RX      (1ul)
+#define PAD_SERIAL1_TX      (UART_TX_PAD_0)
+#define PAD_SERIAL1_RX      (SERCOM_RX_PAD_1)
 
 // Serial2 (Bluetooth BLE_HJ580XP or WiFi)
-#define PIN_SERIAL2_TX    (57ul)
-#define PIN_SERIAL2_RX    (58ul)
-#define PAD_SERIAL2_TX    (UART_TX_PAD_2)
-#define PAD_SERIAL2_RX    (SERCOM_RX_PAD_3)
+#define PIN_SERIAL2_TX      (57ul)
+#define PIN_SERIAL2_RX      (58ul)
+#define PAD_SERIAL2_TX      (UART_TX_PAD_2)
+#define PAD_SERIAL2_RX      (SERCOM_RX_PAD_3)
+
+// SerialSOK (Alternate use of SERCOM4-I2C, TX-SDA, RX-SCL)
+#define PIN_SERIALSOK_TX    (45ul)
+#define PIN_SERIALSOK_RX    (46ul)
+#define PAD_SERIALSOK_TX    (UART_TX_PAD_0)
+#define PAD_SERIALSOK_RX    (SERCOM_RX_PAD_1)
+
 
 /*
  * SPI Interfaces
@@ -205,8 +217,8 @@ static const uint8_t ATN =  PIN_ATN;
 #define PIN_SPI_MISO         (51u)
 #define PIN_SPI_SS           PIN_NOT_CONNECTED // NC, UNDEFINED
 #define PERIPH_SPI           sercom1
-#define PAD_SPI_TX           SPI_PAD_2_SCK_3
-#define PAD_SPI_RX           SERCOM_RX_PAD_0
+#define PAD_SPI_TX           SPI_PAD_3_SCK_1
+#define PAD_SPI_RX           SERCOM_RX_PAD_2
 
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t SCK  = PIN_SPI_SCK  ;
@@ -233,7 +245,14 @@ static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only
 #define SDCARD_MOSI_PIN PIN_SPI1_MOSI
 #define SDCARD_SCK_PIN  PIN_SPI1_SCK
 #define SDCARD_MISO_PIN PIN_SPI1_MISO
-#define SDCARD_SS_PIN   PIN_SPI1_SS
+#define SDCARD_SS_PIN   PIN_SPI1_SS // */
+
+/*/ External SPI as SDCARD
+#define SDCARD_SPI      SPI
+#define SDCARD_MOSI_PIN PIN_SPI_MOSI
+#define SDCARD_SCK_PIN  PIN_SPI_SCK
+#define SDCARD_MISO_PIN PIN_SPI_MISO
+#define SDCARD_SS_PIN   PIN_SPI_SS
 
 
 /*
@@ -264,6 +283,7 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
 /*
  * USB
  */
+#define PIN_USB_HOST_ENABLE PIN_NOT_CONNECTED
 #define PIN_USB_DM          (55ul)
 #define PIN_USB_DP          (56ul)
 
@@ -273,11 +293,37 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
  */
 #define I2S_INTERFACES_COUNT 1
 
+// INTERNAL I2S0
 #define I2S_DEVICE          0
 #define I2S_CLOCK_GENERATOR 3
 #define PIN_I2S_SD          (20u)    // D20 PA19 (I2S_SD[0])
 #define PIN_I2S_SCK         (21u)    // D21 PA20 (I2S_SCK[0])
 #define PIN_I2S_FS          (22u)    // D22 PA21 (I2S_FS[0])
+//#define PIN_I2S_MCK         (PIN_A7) // A7  PA08 (I2S_MCK[0]) // unused, external pinout //*
+
+/*/ EXTERNAL I2S0
+#define I2S_DEVICE          0
+#define I2S_CLOCK_GENERATOR 3
+#define PIN_I2S_SD          (3u)     // D3  PA07 (I2S_SD[0])
+#define PIN_I2S_SCK         (4u)     // D4  PA10 (I2S_SCK[0])
+#define PIN_I2S_FS          (5u)     // D5  PA11 (I2S_FS[0])
+#define PIN_I2S_MCK         (PIN_A7) // A7  PA09 (I2S_MCK[0]) //*/
+
+
+/*
+ * QSPI Pins
+ */
+#define PIN_QSPI_SCK    (61u)
+#define PIN_QSPI_CS     (62u)
+#define PIN_QSPI_IO0    (63u)
+#define PIN_QSPI_IO1    (64u)
+#define PIN_QSPI_IO2    (65u)
+#define PIN_QSPI_IO3    (66u)
+
+#if !defined(VARIANT_QSPI_BAUD_DEFAULT)
+  // TODO: meaningful value for this
+  #define VARIANT_QSPI_BAUD_DEFAULT 5000000
+#endif
 
 #ifdef __cplusplus
 }
@@ -302,6 +348,7 @@ extern SERCOM sercom5;
 
 extern Uart Serial1;
 extern Uart Serial2;
+extern Uart SerialSOK;
 
 #endif
 
