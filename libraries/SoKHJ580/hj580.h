@@ -11,7 +11,7 @@ extern HJ580 ble;
 // BLE_CONFIG   -> PIN*
 // BLE_MSTR_SLV -> PIN
 // BLE_STATE    -> PIN
-// Serial2
+// SerialBLE
 
 #ifdef _VARIANT_GONTAK_SOK_ZERO_
   #define BLE_ENABLE    PIN_NOT_CONNECTED

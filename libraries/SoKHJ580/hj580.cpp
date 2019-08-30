@@ -23,7 +23,8 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	reset();
 
 	// BLE Initial Configuration
-	this->uart->begin(19200);
+	//this->uart->begin(19200); // Taobao (Old) HJ-580XP
+	this->uart->begin(115200); 	// Aliexpress HJ-580XP
 
 	String commands[5] = { 	"NAME"+String("SoK"), 
 							"SOFT"+softVersion, 

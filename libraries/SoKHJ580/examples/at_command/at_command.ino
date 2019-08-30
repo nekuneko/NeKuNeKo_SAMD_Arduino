@@ -94,14 +94,14 @@ void loop() {
       else
       { 
         Serial.println("Sending...  " + s);
-        Serial2.print(s);
+        SerialBLE.print(s);
       }
     }
   }
 
-  while (Serial2.available())
+  while (SerialBLE.available())
   {
-    String s = Serial2.readString();
+    String s = SerialBLE.readString();
     Serial.print("Received... " + s);
   }
   
