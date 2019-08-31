@@ -247,27 +247,21 @@ static const uint8_t MISO1 = PIN_SPI1_MISO ;
 static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only for reference.
 
 
-
 // Needed for SD library, taken from MKRZero variant.h file
-//#if defined(USE_SPI1) // Internal SPI1 as SDCARD  (default)
-#define SDCARD_SPI      SPI1
-#define SDCARD_MOSI_PIN PIN_SPI1_MOSI
-#define SDCARD_SCK_PIN  PIN_SPI1_SCK
-#define SDCARD_MISO_PIN PIN_SPI1_MISO
-#define SDCARD_SS_PIN   PIN_SPI1_SS // */
-/*/#else // External SPI as SDCARD
-#define SDCARD_SPI      SPI
-#define SDCARD_MOSI_PIN PIN_SPI_MOSI
-#define SDCARD_SCK_PIN  PIN_SPI_SCK
-#define SDCARD_MISO_PIN PIN_SPI_MISO
-#define SDCARD_SS_PIN   PIN_SPI_SS  // */
-//#endif
-
-#if defined(_USE_SPI_)
-  #define SPI_COJONES 0
-#elif defined (_USE_SPI1_)
-  #define SPI_COJONES 1
+#if defined(USE_EXTERNAL_SPI) // External SPI as SDCARD 
+  #define SDCARD_SPI      SPI
+  #define SDCARD_MOSI_PIN PIN_SPI_MOSI
+  #define SDCARD_SCK_PIN  PIN_SPI_SCK
+  #define SDCARD_MISO_PIN PIN_SPI_MISO
+  #define SDCARD_SS_PIN   PIN_SPI_SS  
+#else // Internal SPI1 as SDCARD  (default)
+  #define SDCARD_SPI      SPI1
+  #define SDCARD_MOSI_PIN PIN_SPI1_MOSI
+  #define SDCARD_SCK_PIN  PIN_SPI1_SCK
+  #define SDCARD_MISO_PIN PIN_SPI1_MISO
+  #define SDCARD_SS_PIN   PIN_SPI1_SS 
 #endif
+
 
 /*
  * Wire Interfaces
@@ -283,7 +277,6 @@ static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-
 // Secondary I2C pins (I2C1, INTERNAL)
 #define PIN_WIRE1_SDA         (47u)
 #define PIN_WIRE1_SCL         (48u)
@@ -297,9 +290,9 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
 /*
  * USB
  */
-#define PIN_USB_HOST_ENABLE PIN_NOT_CONNECTED
-#define PIN_USB_DM          (55ul)
-#define PIN_USB_DP          (56ul)
+#define PIN_USB_HOST_ENABLE   PIN_NOT_CONNECTED
+#define PIN_USB_DM            (55ul)
+#define PIN_USB_DP            (56ul)
 
 
 /*
@@ -307,25 +300,24 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
  */
 #define I2S_INTERFACES_COUNT 1
 
-
-#if defined(USE_I2S) // INTERNAL I2S0 (default)
-#define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-#define PIN_I2S_SDO         (3u)     // D3  PA11 (I2S_SDO) // unused, external pinout
-#define PIN_I2S_SCK         (20u)    // D21 PB16 (I2S_SCK[0])
-#define PIN_I2S_FS          (21u)    // D22 PA20 (I2S_FS[0]) 
-#define PIN_I2S_SDI         (22u)    // D20 PA22 (I2S_SDI)
-#define PIN_I2S_MCK         (PIN_A7) // A7  PA08 (I2S_MCK[0]) // unused, external pinout // */
-#else
-// EXTERNAL I2S0
-#define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-#define PIN_I2S_SDO         (3u)     // D3  PA11 (I2S_SDO)
-#define PIN_I2S_SCK         (4u)     // D4  PA10 (I2S_SCK[0])
-#define PIN_I2S_FS          (5u)     // D5  PA09 (I2S_FS[0])
-#define PIN_I2S_SDI         (6u)     // D6  PB10 (I2S1_SDI)
-#define PIN_I2S_MCK         (PIN_A7) // A7  PA08 (I2S_MCK[0]) //*/
+#if defined(USE_EXTERNAL_I2S) // EXTERNAL I2S0
+  #define I2S_DEVICE          0
+  #define I2S_CLOCK_GENERATOR 3
+  #define PIN_I2S_SDO         (3u)     // D3  PA11 (I2S_SDO)
+  #define PIN_I2S_SCK         (4u)     // D4  PA10 (I2S_SCK[0])
+  #define PIN_I2S_FS          (5u)     // D5  PA09 (I2S_FS[0])
+  #define PIN_I2S_SDI         (6u)     // D6  PB10 (I2S1_SDI)
+  #define PIN_I2S_MCK         (PIN_A7) // A7  PA08 (I2S_MCK[0]) 
+#else // INTERNAL I2S0 (default)
+  #define I2S_DEVICE          0
+  #define I2S_CLOCK_GENERATOR 3
+  #define PIN_I2S_SDO         PIN_NOT_CONNECTED
+  #define PIN_I2S_SCK         (20u)    // D21 PB16 (I2S_SCK[0])
+  #define PIN_I2S_FS          (21u)    // D22 PA20 (I2S_FS[0]) 
+  #define PIN_I2S_SDI         (22u)    // D20 PA22 (I2S_SDI)
+  #define PIN_I2S_MCK         PIN_NOT_CONNECTED
 #endif
+
 
 /*
  * QSPI Pins
@@ -363,7 +355,7 @@ extern SERCOM sercom3;
 extern SERCOM sercom4;
 extern SERCOM sercom5;
 
-extern Uart Serial1;
+//extern Uart Serial1;
 extern Uart Serial2;
 extern Uart SerialSOK;
 
@@ -389,7 +381,6 @@ extern Uart SerialSOK;
 
 #define SERIAL_PORT_HARDWARE        Serial2
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
-
 
 
 #endif /* _VARIANT_SOK_M4_ADVANCE_ */

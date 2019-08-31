@@ -1,7 +1,9 @@
-# NekuNeko Arduino Core for SAMD21 CPU
+# Arduino Core for SAMD21 and SAMD51 CPU
 
-This repository contains the source code and configuration files of the NekuNeko Arduino Core
-for Atmel's SAMD21 processor (used on the Stimey SAMD21G18A, Gontak Sok One).
+This repository contains the source code and configuration files of the Arduino Core
+for Atmel's SAMD21 and SAMD51 processor (used on the Arduino/Genuino Zero, MKR1000 and MKRZero boards).
+
+In particular, this adds support for the NeKuNeKo SAMD Boards such as the SoK Zero Dawn & SoK M4 Advance.
 
 ## Installation on Arduino IDE
 
@@ -23,6 +25,10 @@ There is a dedicated section of the Arduino Forum for general discussion and pro
 http://forum.arduino.cc/index.php?board=98.0
 
 ## Bugs or Issues
+
+* AREF must be tied to 3.3V for dac to work. This is a bug in the SAMD51 silicon.
+* USB host mode doesn't work yet
+
 
 If you find a bug you can submit an issue here on github:
 

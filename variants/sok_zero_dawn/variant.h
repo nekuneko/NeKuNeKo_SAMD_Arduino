@@ -124,7 +124,7 @@ static const uint8_t D20  = 20; // I2S_SD0
 static const uint8_t D21  = 21; // I2S_SCK0
 static const uint8_t D22  = 22; // I2S_FS0
 static const uint8_t D23  = 23; // NC
-static const uint8_t D24  = 24; // NC
+static const uint8_t D24  = 24; // INT_APDS
 
 
 /*
@@ -240,19 +240,21 @@ static const uint8_t SCK1  = PIN_SPI1_SCK  ;
 static const uint8_t MISO1 = PIN_SPI1_MISO ;
 static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only for reference.
 
-// Needed for SD library, taken from MKRZero variant.h file
-#define SDCARD_SPI      SPI1
-#define SDCARD_MOSI_PIN PIN_SPI1_MOSI
-#define SDCARD_SCK_PIN  PIN_SPI1_SCK
-#define SDCARD_MISO_PIN PIN_SPI1_MISO
-#define SDCARD_SS_PIN   PIN_SPI1_SS // */
 
-/*/ External SPI as SDCARD
-#define SDCARD_SPI      SPI
-#define SDCARD_MOSI_PIN PIN_SPI_MOSI
-#define SDCARD_SCK_PIN  PIN_SPI_SCK
-#define SDCARD_MISO_PIN PIN_SPI_MISO
-#define SDCARD_SS_PIN   PIN_SPI_SS
+// Needed for SD library, taken from MKRZero variant.h file
+#if defined(USE_EXTERNAL_SPI) // External SPI as SDCARD 
+  #define SDCARD_SPI      SPI
+  #define SDCARD_MOSI_PIN PIN_SPI_MOSI
+  #define SDCARD_SCK_PIN  PIN_SPI_SCK
+  #define SDCARD_MISO_PIN PIN_SPI_MISO
+  #define SDCARD_SS_PIN   PIN_SPI_SS  
+#else // Internal SPI1 as SDCARD  (default)
+  #define SDCARD_SPI      SPI1
+  #define SDCARD_MOSI_PIN PIN_SPI1_MOSI
+  #define SDCARD_SCK_PIN  PIN_SPI1_SCK
+  #define SDCARD_MISO_PIN PIN_SPI1_MISO
+  #define SDCARD_SS_PIN   PIN_SPI1_SS 
+#endif
 
 
 /*
@@ -269,7 +271,6 @@ static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-
 // Secondary I2C pins (I2C1, INTERNAL)
 #define PIN_WIRE1_SDA         (47u)
 #define PIN_WIRE1_SCL         (48u)
@@ -283,9 +284,9 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
 /*
  * USB
  */
-#define PIN_USB_HOST_ENABLE PIN_NOT_CONNECTED
-#define PIN_USB_DM          (55ul)
-#define PIN_USB_DP          (56ul)
+#define PIN_USB_HOST_ENABLE   PIN_NOT_CONNECTED
+#define PIN_USB_DM            (55ul)
+#define PIN_USB_DP            (56ul)
 
 
 /*
@@ -293,21 +294,21 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
  */
 #define I2S_INTERFACES_COUNT 1
 
-// INTERNAL I2S0
-#define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-#define PIN_I2S_SD          (20u)    // D20 PA19 (I2S_SD[0])
-#define PIN_I2S_SCK         (21u)    // D21 PA20 (I2S_SCK[0])
-#define PIN_I2S_FS          (22u)    // D22 PA21 (I2S_FS[0])
-//#define PIN_I2S_MCK         (PIN_A7) // A7  PA08 (I2S_MCK[0]) // unused, external pinout //*
-
-/*/ EXTERNAL I2S0
-#define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-#define PIN_I2S_SD          (3u)     // D3  PA07 (I2S_SD[0])
-#define PIN_I2S_SCK         (4u)     // D4  PA10 (I2S_SCK[0])
-#define PIN_I2S_FS          (5u)     // D5  PA11 (I2S_FS[0])
-#define PIN_I2S_MCK         (PIN_A7) // A7  PA09 (I2S_MCK[0]) //*/
+#if defined(USE_EXTERNAL_I2S) // EXTERNAL I2S0
+  #define I2S_DEVICE          0
+  #define I2S_CLOCK_GENERATOR 3
+  #define PIN_I2S_SD          (3u)     // D3  PA07 (I2S_SD[0])
+  #define PIN_I2S_SCK         (4u)     // D4  PA10 (I2S_SCK[0])
+  #define PIN_I2S_FS          (5u)     // D5  PA11 (I2S_FS[0])
+  #define PIN_I2S_MCK         (PIN_A7) // A7  PA09 (I2S_MCK[0])
+#else // INTERNAL I2S0 (default)
+  #define I2S_DEVICE          0
+  #define I2S_CLOCK_GENERATOR 3
+  #define PIN_I2S_SD          (20u)    // D20 PA19 (I2S_SD[0])
+  #define PIN_I2S_SCK         (21u)    // D21 PA20 (I2S_SCK[0])
+  #define PIN_I2S_FS          (22u)    // D22 PA21 (I2S_FS[0])
+  #define PIN_I2S_MCK         PIN_NOT_CONNECTED
+#endif
 
 
 /*

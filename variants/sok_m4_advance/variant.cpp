@@ -115,7 +115,7 @@ const PinDescription g_APinDescription[]=
   // 49...51 Primary SPI pins (EXTERNAL SPI: MOSI, SCK, MISO)
   // ----------------------
   { PORTA, 31, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_11 },    // 49 MOSI  ALT_SERCOM1/PAD[2]  /         /                / INT_10 / (SPI_MOSI, EXTERNAL) 
-  { PORTA,  1, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_NONE },  // 50 SCK   ALT_SERCOM1/PAD[3]  /         /                / INT_11 / (SPI_SCK,  EXTERNAL)
+  { PORTA,  1, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_1  },    // 50 SCK   ALT_SERCOM1/PAD[1]  /         /                / INT_1  / (SPI_SCK,  EXTERNAL)
   { PORTA, 30, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_10 },    // 51 MISO  ALT_SERCOM1/PAD[3]  /         /                / INT_11 / (SPI_SCK,  EXTERNAL)
 
 
@@ -188,10 +188,13 @@ void SERCOM0_Handler()
   Serial1.IrqHandler();
 } 
 
+#if defined(USE_SERIAL_SOK)
+#warning External Wire I2C interface won't be available meanwhile you use SerialSOK
 void SERCOM4_Handler()
 {
   SerialSOK.IrqHandler();
 } 
+#endif
 
 void SERCOM5_Handler()
 {

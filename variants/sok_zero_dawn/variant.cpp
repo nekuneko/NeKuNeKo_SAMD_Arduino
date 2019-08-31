@@ -179,10 +179,13 @@ void SERCOM0_Handler()
   Serial1.IrqHandler();
 } 
 
+#if defined (USE_SERIAL_SOK)
+#warning External Wire I2C interface won't be available meanwhile you use SerialSOK
 void SERCOM4_Handler()
 {
   SerialSOK.IrqHandler();
-} 
+}
+#endif
 
 void SERCOM5_Handler()
 {
