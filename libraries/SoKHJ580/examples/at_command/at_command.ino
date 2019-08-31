@@ -1,6 +1,3 @@
-
-// BLE: Pin definitions
-
 #include <hj580.h>
 
 HJ580 ble; 
@@ -23,15 +20,11 @@ void setup()
 {
   Serial.begin(115200);
   while(!Serial);
-    Serial.println("\tHJ-580XP bluetooth low energy module LIBRARY test");
-    Serial.println("\tRemember to configure Serial Monitor to: No Line adjustment + 112500 baudrate");
+  Serial.println("\tHJ-580XP bluetooth low energy module LIBRARY test");
+  Serial.println("\tRemember to configure Serial Monitor to: No Line adjustment + 112500 baudrate");
   
-  
-  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
   
-
-
   if (ble.begin())
     Serial.println("BLE begin OK");
   else
@@ -94,14 +87,14 @@ void loop() {
       else
       { 
         Serial.println("Sending...  " + s);
-        SerialBLE.print(s);
+        Serial2.print(s);
       }
     }
   }
 
-  while (SerialBLE.available())
+  while (Serial2.available())
   {
-    String s = SerialBLE.readString();
+    String s = Serial2.readString();
     Serial.print("Received... " + s);
   }
   
