@@ -20,16 +20,17 @@ extern DriveSoK car;
 // the default pins listed are the ones used on the Redbot (ROB-12097) with
 // the exception of STBY which the Redbot controls with a physical switch
 // NOTE! This pin definition is only valid for SoK Zero
-static const int PWMA = D8;
-static const int AIN2 = D7;
-static const int AIN1 = D6;
-static const int STBY = D5;
-static const int BIN1 = D4;
-static const int BIN2 = D3;
-static const int PWMB = D2;
+static const int PWMA = D9;
+static const int AIN2 = D8;
+static const int AIN1 = D7;
+static const int STBY = D0;
+static const int BIN1 = A9;
+static const int BIN2 = A8;
+static const int PWMB = A7;
 
-static const int FORE_LIGHTS[4] = {A1, A0, SCK, MOSI}; // IZQ_A, IZQ_B, DER_A, DER_B
-static const int BACK_LIGHTS[4]  = {D9, D11, D13, D12}; // IZQ_A, IZQ_B, DER_A, DER_B
+static const int FORE_LIGHTS[4] = {A0, A1, A2, A3}; 	// IZQ_A, IZQ_B, DER_A, DER_B
+static const int BACK_LIGHTS[4] = {D10, D11, D12, D13}; // IZQ_A, IZQ_B, DER_A, DER_B
+static const int OTHR_LIGHTS[3] = {A4, A5, A6}; 		// 
 
 // these constants are used to allow you to make your motor configuration 
 // line up with function names like forward.  Value can be 1 or -1

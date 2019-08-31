@@ -26,7 +26,7 @@ class HJ580
 {
 public:
 
-  bool begin (String softVersion = " ", unsigned long baud = 115200, Uart* u = &Serial2);
+  bool begin (String softVersion = String(__DATE__), unsigned long baud = 115200, Uart* u = &Serial2);
 
 
   void reset (unsigned long timeReset = 50);

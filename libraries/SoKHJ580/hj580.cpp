@@ -3,10 +3,18 @@
 
 bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 {
+	String name = "HJ-580";
 	bool success   = true;
 	this->baudRate = baud;
 	this->uart     = u;
 
+	#if defined(_VARIANT_SOK_ZER_DAWN_)
+		name = "SoK Zero Dawn";
+
+	#elif defined(_VARIANT_SOK_M4_ADVANCE_)
+		name = "SoK M4 Advance";
+	#endif
+		
 	// BLE: Pin initialization
 	pinMode(BLE_RESET,  	OUTPUT);   		// HIGH: System Reset,        	LOW: System ON 
 	pinMode(BLE_ENABLE,		OUTPUT);		// HIGH: Uart RX disabled, 		LOW: Uart RX enabled
@@ -26,7 +34,7 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	//this->uart->begin(19200); // Taobao (Old) HJ-580XP
 	this->uart->begin(115200); 	// Aliexpress HJ-580XP
 
-	String commands[5] = { 	"NAME"+String("SoK"), 
+	String commands[5] = { 	"NAME"+name, 
 							"SOFT"+softVersion, 
 							"FAC" +String("NeKuNeKo Inc."), 
 							"BAUD"+String(baudRate), 
