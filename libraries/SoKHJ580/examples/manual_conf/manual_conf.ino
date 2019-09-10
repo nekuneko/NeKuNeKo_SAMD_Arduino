@@ -29,6 +29,7 @@ void setup()
   Serial.begin(115200);
   while(!Serial);
   Serial.println("\tHJ-580XP bluetooth low energy module MANUAL test");
+  Serial.println("\tRemember to configure Serial Monitor to: No Line adjustment + 112500 baudrate");
   
   // BLE: Pin initialization
   pinMode(BLE_RESET,    OUTPUT);        // HIGH: System Reset,          LOW: System ON 
@@ -45,8 +46,8 @@ void setup()
 
   // Perform reset
   Serial.print("Performing reset... ");
-  digitalWrite(BLE_RESET, HIGH);    delay(50); // Perform Reset
-  digitalWrite(BLE_RESET, LOW);                // Release reset, System ON in AT COMMAND mode.
+  digitalWrite(BLE_RESET, HIGH);    delay(150); // Perform Reset
+  digitalWrite(BLE_RESET, LOW);     delay(150);           // Release reset, System ON in AT COMMAND mode.
   Serial.println("<OK>");
   
   // BLE: Enter AT Command mode
@@ -54,7 +55,7 @@ void setup()
   Serial.println("Enter AT Command mode... <OK>");
   
   // BLE: Configure BLE
-  SerialBLE.begin(19200);
+  SerialBLE.begin(115200);
   while(!SerialBLE);
   Serial.print("Setting Baudrate... ");              ble_writeCommand("<BAUD"+BAUD_RATE+">");    // Set Baudrate to 115200
   Serial.print("Setting Device name... ");           ble_writeCommand("<NAME"+DEVICE_NAME+">");  // Set Device Name to DEVICE_NAME
@@ -78,6 +79,7 @@ void setup()
 
   // Done
   Serial.println("\nConfiguration done. Multiserial initiated:");
+  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 }
 
@@ -103,6 +105,4 @@ void loop() {
   
   while(SerialBLE.available())
     Serial.print("Received... " + SerialBLE.readString());
-
-  delay(1000);
 }

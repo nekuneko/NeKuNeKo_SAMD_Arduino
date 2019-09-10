@@ -23,8 +23,6 @@ void setup()
   Serial.println("\tHJ-580XP bluetooth low energy module LIBRARY test");
   Serial.println("\tRemember to configure Serial Monitor to: No Line adjustment + 112500 baudrate");
   
-  digitalWrite(LED_BUILTIN, LOW);
-  
   if (ble.begin())
     Serial.println("BLE begin OK");
   else
@@ -42,7 +40,11 @@ void setup()
   Serial.println("DeviceName:       "+ble.writeCommand("MNAME"));
   Serial.println("SoftwareVersion:  "+ble.writeCommand("SVER"));
   Serial.println("ManufacturerName: "+ble.writeCommand("FNAME"));
-  
+
+  // Done
+  Serial.println("\nConfiguration done. Multiserial initiated:");
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
