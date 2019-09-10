@@ -8,7 +8,7 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	this->baudRate = baud;
 	this->uart     = u;
 
-	#if defined(_VARIANT_SOK_ZER_DAWN_)
+	#if defined(_VARIANT_SOK_ZERO_DAWN_)
 		name = "SoK Zero Dawn";
 
 	#elif defined(_VARIANT_SOK_M4_ADVANCE_)
@@ -31,8 +31,9 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	reset();
 
 	// BLE Initial Configuration
-	this->uart->begin(19200); // Taobao (Old) HJ-580XP
-	//this->uart->begin(115200); 	// Aliexpress HJ-580XP
+	//this->uart->begin(19200); // Taobao (Old) HJ-580XP
+	this->uart->begin(115200); 	// Aliexpress HJ-580XP
+	delay(1000);
 
 	String commands[5] = { 	"NAME"+name, 
 							"SOFT"+softVersion, 
@@ -49,7 +50,7 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 void HJ580::reset (unsigned long timeReset)
 {
 	digitalWrite(BLE_RESET, HIGH);    delay(timeReset); // Perform Reset
-    digitalWrite(BLE_RESET, LOW);     //delay(150); 	// Release reset, System ON in AT COMMAND mode.
+    digitalWrite(BLE_RESET, LOW);     delay(150); 	 	// Release reset, System ON in AT COMMAND mode.
 }
 
 
@@ -79,8 +80,8 @@ bool HJ580::writeCommands (String* commands, int size)
 		success &= checkResponse(response);
 
 		// Debug
-		Serial.print(command + ": ");
-		Serial.println(response);	
+		//Serial.print(command + ": ");
+		//Serial.println(response);	
 	}
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
