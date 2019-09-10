@@ -108,8 +108,8 @@ const PinDescription g_APinDescription[]=
 
   // 47...48 Secondary I2C pins (INTERNAL I2C: SDA1, SCL1)
   // ----------------------
-  { PORTA, 16, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0 },     // 47 SDA1  ALT_SERCOM3/PAD[0]  /         /                / INT_0  / (I2C_SDA1, INTERNAL)
-  { PORTA, 17, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM_E|PIN_ATTR_TIMER),                   No_ADC_Channel,   TCC2_CH1,     TCC2_CH1, EXTERNAL_INT_1 },     // 48 SCL1  ALT_SERCOM3/PAD[1]  /         /    TCC2_WO[1]  / INT_1  / (I2C_SCL1, INTERNAL)       
+  { PORTA, 17, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM_E|PIN_ATTR_TIMER),                   No_ADC_Channel,   TCC2_CH1,     TCC2_CH1, EXTERNAL_INT_1 },     // 47 SDA1  ALT_SERCOM3/PAD[0]  /         /    TCC2_WO[1]  / INT_1  / (I2C_SCL1, INTERNAL)       
+  { PORTA, 16, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL),                                                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0 },     // 48 SCL1  ALT_SERCOM3/PAD[1]  /         /                / INT_0  / (I2C_SDA1, INTERNAL)
  
 
   // 49...51 Primary SPI pins (EXTERNAL SPI: MOSI, SCK, MISO)
