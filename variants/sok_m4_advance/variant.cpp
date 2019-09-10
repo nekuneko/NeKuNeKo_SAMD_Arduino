@@ -183,21 +183,59 @@ Uart Serial2   ( &sercom5, PIN_SERIAL2_RX,   PIN_SERIAL2_TX,   PAD_SERIAL2_RX,  
 Uart SerialSOK ( &sercom4, PIN_SERIALSOK_RX, PIN_SERIALSOK_TX, PAD_SERIALSOK_RX, PAD_SERIALSOK_TX ); // Alternative use of SERCOM 4
 
 
-void SERCOM0_Handler()
+// SERCOM 0
+void SERCOM0_0_Handler()
 {
   Serial1.IrqHandler();
-} 
+}
+void SERCOM0_1_Handler()
+{
+  Serial1.IrqHandler();
+}
+void SERCOM0_2_Handler()
+{
+  Serial1.IrqHandler();
+}
+void SERCOM0_3_Handler()
+{
+  Serial1.IrqHandler();
+}
 
+// SERCOM 4
 #if defined(USE_SERIAL_SOK)
 #warning External Wire I2C interface won't be available meanwhile you use SerialSOK
-void SERCOM4_Handler()
+void SERCOM4_0_Handler()
 {
   SerialSOK.IrqHandler();
-} 
+}
+void SERCOM4_1_Handler()
+{
+  SerialSOK.IrqHandler();
+}
+void SERCOM4_2_Handler()
+{
+  SerialSOK.IrqHandler();
+}
+void SERCOM4_3_Handler()
+{
+  SerialSOK.IrqHandler();
+}
 #endif
 
-void SERCOM5_Handler()
+// SERCOM 5
+void SERCOM5_0_Handler()
 {
   Serial2.IrqHandler();
-} 
-
+}
+void SERCOM5_1_Handler()
+{
+  Serial2.IrqHandler();
+}
+void SERCOM5_2_Handler()
+{
+  Serial2.IrqHandler();
+}
+void SERCOM5_3_Handler()
+{
+  Serial2.IrqHandler();
+}
