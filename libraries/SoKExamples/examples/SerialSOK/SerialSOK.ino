@@ -1,6 +1,13 @@
-
+// Please Enable SerialSOK on Tools > SerialSOK with having selected a SoK board
 // Replace Serial1 with SerialSOK
-#define Serial1 SerialSOK //*/ // Please Enable SerialSOK on Tools > SerialSOK with having selected a SoK board
+#define Serial1 SerialSOK //*/ // Comment this line to test Serial1 instead of SerialSOK
+
+// Configuration:
+// Baudrate: 115200
+// Parity: none
+// Data bits: 8
+// Stop bits: 1
+// Line Adjust: NL & CR
 
 void setup() {
   // initialize both serial ports:

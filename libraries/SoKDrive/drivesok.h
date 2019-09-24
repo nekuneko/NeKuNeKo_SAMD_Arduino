@@ -28,8 +28,8 @@ static const int BIN1 = A9;
 static const int BIN2 = A8;
 static const int PWMB = A7;
 
-static const int FORE_LIGHTS[4] = {A0, A1, A2, A3}; 	// IZQ_A, IZQ_B, DER_A, DER_B
-static const int BACK_LIGHTS[4] = {D10, D11, D12, D13}; // IZQ_A, IZQ_B, DER_A, DER_B
+static const int BACK_LIGHTS[4] = {A0, A1, A2, A3}; 	// IZQ_A, IZQ_B, DER_A, DER_B
+static const int FORE_LIGHTS[4] = {D10, D11, D12, D13}; // IZQ_A, IZQ_B, DER_A, DER_B
 static const int OTHR_LIGHTS[3] = {A4, A5, A6}; 		// 
 
 // these constants are used to allow you to make your motor configuration 
