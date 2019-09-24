@@ -76,7 +76,7 @@ const PinDescription g_APinDescription[]=
   { PORTA,  2, PIO_ANALOG,      (PIN_ATTR_ANALOG),                    ADC_Channel0,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2    },  // 29 A4                       / AIN[0]  /  DAC_Channel0 / INT_2 / DAC0 / VOUT0
   { PORTB,  4, PIO_ANALOG,      (PIN_ATTR_ANALOG_ALT),                ADC_Channel6,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4    },  // 30 A5                       / AIN[6]  /               / INT_4*
   { PORTB,  5, PIO_ANALOG,      (PIN_ATTR_ANALOG_ALT),                ADC_Channel7,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5    },  // 31 A6                       / AIN[7]  /               / INT_5*
-  { PORTA,  8, PIO_SERCOM,      (PIN_ATTR_ANALOG_ALT|PIN_ATTR_PWM_F), ADC_Channel8,  TCC0_CH0,   TCC0_CH0,     EXTERNAL_INT_NONE },  // 32 A7       SERCOM0_PAD[0]  / AIN[8]  /  F_TCC0_WO[0] / NMI
+  { PORTA,  8, PIO_SERCOM,      (PIN_ATTR_ANALOG|PIN_ATTR_PWM_F),     ADC_Channel8,  TCC0_CH0,   TCC0_CH0,     EXTERNAL_INT_NONE },  // 32 A7       SERCOM0_PAD[0]  / AIN[8]  /  F_TCC0_WO[0] / NMI
   { PORTB,  6, PIO_ANALOG,      (PIN_ATTR_ANALOG_ALT),                ADC_Channel8,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_6    },  // 33 A8                       / AIN[8]  /               / INT_6*
   { PORTB,  7, PIO_ANALOG,      (PIN_ATTR_ANALOG_ALT),                ADC_Channel9,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_7    },  // 34 A9                       / AIN[9]  /               / INT_7*
   { PORTA,  4, PIO_SERCOM_ALT,  (PIN_ATTR_ANALOG|PIN_ATTR_PWM_E),     ADC_Channel4,  TC0_CH0,    TC0_CH0,      EXTERNAL_INT_4    },  // 35 A10  ALT_SERCOM0_PAD[0]  / AIN[4]  /  E__TC0_WO[0] / INT_4  / (D0, Serial_TX)
