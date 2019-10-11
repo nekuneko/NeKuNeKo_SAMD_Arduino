@@ -1,19 +1,49 @@
 #include "hj580.h"
 
 
-bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
+void HJ580::beginBaudRate (uint32_t baudrate)
 {
-	String name = "HJ-580";
-	bool success   = true;
-	this->baudRate = baud;
-	this->uart     = u;
+	_uart->end();
+	_uart->begin(baudrate); 		
+	while(!_uart);
+}
 
-	#if defined(_VARIANT_SOK_ZERO_DAWN_)
-		name = "SoK Zero Dawn";
+bool HJ580::guessBaudRate(void)
+{
+	bool success = true;
 
-	#elif defined(_VARIANT_SOK_M4_ADVANCE_)
-		name = "SoK M4 Advance";
-	#endif
+	_baudRateAtReset = 115200;
+	beginBaudRate(_baudRateAtReset); // Aliexpress (New) HJ-580XP
+	if (!checkCommand("STATE")) {
+		_baudRateAtReset = 19200;	// Taobao (Old) HJ-580XP
+		beginBaudRate(_baudRateAtReset);
+		
+		if (!checkCommand("STATE")) {
+			_baudRateAtReset = 9600;	// Another baudrate ??
+			beginBaudRate(_baudRateAtReset);
+
+			if (!checkCommand("STATE")) {
+				_baudRateAtReset = 0;
+				success = false;
+			}
+		}
+	}
+	if (success)
+		_errors += "\tbaudrate at reset is " + String(_baudRateAtReset) + "\n";
+	else
+		_errors += "\tbaudrate at reset is unknown\n";
+
+	return success;
+}
+
+
+
+bool HJ580::begin (Uart* u, uint32_t finalBaudrate)
+{
+	_baudRate = finalBaudrate;
+	_uart     = u;
+	_errors   = String();
+	bool success = true;
 		
 	// BLE: Pin initialization
 	pinMode(BLE_RESET,  	OUTPUT);   		// HIGH: System Reset,        	LOW: System ON 
@@ -22,66 +52,86 @@ bool HJ580::begin (String softVersion, unsigned long baud, Uart* u)
 	pinMode(BLE_MSTR_SLV, 	OUTPUT);		// HIGH: Slave mode, 			LOW: Master mode
 	pinMode(BLE_STATE, 		INPUT_PULLUP);	// HIGH: BLE disconencted, 		LOW: BLE connected to host/peripheral
 
-	digitalWrite(BLE_RESET, 	HIGH);		// System Reset
+	digitalWrite(BLE_RESET, 	LOW);		// System NOT in Reset
 	digitalWrite(BLE_ENABLE, 	LOW);		// Uart RX enabled
-	digitalWrite(BLE_CONFIG, 	LOW);		// Transparent UART mode
+	digitalWrite(BLE_CONFIG, 	LOW);		// Config mode.
 	digitalWrite(BLE_MSTR_SLV, 	HIGH);		// Slave mode
 
 	// Reset configurations
-	reset();
+	hardReset();
 
-	// BLE Initial Configuration
-	//this->uart->begin(19200); // Taobao (Old) HJ-580XP
-	this->uart->begin(115200); 	// Aliexpress HJ-580XP
-	delay(1000);
+	// BLE Initial Configuration, initial baudrate selection
+	success &= guessBaudRate();
+	
 
-	String commands[5] = { 	"NAME"+name, 
-							"SOFT"+softVersion, 
-							"FAC" +String("NeKuNeKo Inc."), 
-							"BAUD"+String(baudRate), 
-							"DISCONNECT"};
-	success = writeCommands(commands, 5);
+	// Begin final baudrate
+	//success &= checkCommand("FACTORY");
+	//softReset();
+	success &= disconnect();
+	success &= setBaudRate(_baudRate);
+	digitalWrite(BLE_CONFIG, 	HIGH);		// Config mode OFF. Transparent UART mode.
 
-	this->uart->begin(baudRate);
+	beginBaudRate(_baudRate);
 	
 	return success;
 }
 
-void HJ580::reset (unsigned long timeReset)
+void HJ580::hardReset (uint16_t timeReset)
 {
 	digitalWrite(BLE_RESET, HIGH);    delay(timeReset); // Perform Reset
     digitalWrite(BLE_RESET, LOW);     delay(150); 	 	// Release reset, System ON in AT COMMAND mode.
 }
 
-
-
-
-String HJ580::readCommand (unsigned long timeout)
+void HJ580::softReset (uint16_t timeReset)
 {
-	this->uart->setTimeout(timeout);
-	return this->uart->readString();
+	writeCommand("RESET"); delay(timeReset);
+	beginBaudRate(_baudRateAtReset);
+	setBaudRate(_baudRate);
+	beginBaudRate(_baudRate);
 }
 
 
 
-bool HJ580::writeCommands (String* commands, int size)
+String HJ580::readCommand (uint16_t timeout)
+{
+	_uart->setTimeout(timeout);
+	return _uart->readString();
+}
+
+size_t HJ580::readCommandBytes (uint8_t* buffer, int32_t length, uint16_t timeout)
+{
+	_uart->setTimeout(timeout);
+	return _uart->readBytes(buffer, length);
+}
+
+
+bool HJ580::writeCommands (String* commands, int32_t numCommands)
 {
 	String response = "";
 	String command  = "";
 	bool   success  = true;
 
+	// Debug
+	#if defined(DEBUG)
+	Serial.print("writeCommands-> numCommands: ");
+	Serial.println(numCommands);
+	Serial.print("writeCommands-> commands: ");
+	#endif
+
 	atmodeON(); // Enter AT Command mode
-	for (int i=0; i<=size-1; ++i)
+	for (int i=0; i<=numCommands-1; ++i)
 	{
 		command = "<"+commands[i]+">";
-		this->uart->write(command.c_str());	// Send AT Command
+		_uart->write(command.c_str());	// Send AT Command
 		response = readCommand(); 			// Receive Acknowledgement
 
 		success &= checkResponse(response);
 
 		// Debug
-		//Serial.print(command + ": ");
-		//Serial.println(response);	
+		#if defined(DEBUG)
+		Serial.print(command + ": ");
+		Serial.println(response + "\t");	
+		#endif
 	}
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
@@ -93,26 +143,71 @@ String HJ580::writeCommand (String command)
 {
 	String response = "";
 
+	if (command.equalsIgnoreCase("MASTER"))
+	{
+		setMasterMode();
+		return String("Enter in Master mode");
+	}
+	else if (command.equalsIgnoreCase("SLAVE"))
+	{
+		setSlaveMode();
+		return String("Enter in Slave mode");
+	}
 	atmodeON(); // Enter AT Command mode
-	
+
 	command = "<"+command+">";
-	this->uart->write(command.c_str()); // Send AT Command
+	_uart->write(command.c_str()); // Send AT Command
 	response = readCommand(); 			// Receive Acknowledgement
 
 	// Debug
-	//Serial.print(command + ": ");
-	//Serial.println(response);	
+	#if defined(DEBUG)
+	Serial.print("writeCommand-> ");
+	Serial.print(command + ": ");
+	Serial.println(response);	
+	#endif
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
 
 	return response;
 }
 
+size_t HJ580::writeCommandBytes (String command, uint8_t* buffer, int32_t length)
+{
+	size_t response = 0;
+
+	atmodeON(); // Enter AT Command mode
+
+	command = "<"+command+">";
+	_uart->write(command.c_str());					 // Send AT Command
+	response = readCommandBytes(buffer, length); 	// Receive Acknowledgement
+
+	// Debug
+	#if defined(DEBUG)
+	Serial.print("writeCommandBytes-> ");
+	Serial.print(command + ": ");
+	Serial.println(response);	
+	#endif
+
+	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
+
+	return response;
+}
 
 bool HJ580::checkResponse (String response)
 {
 	// Erase characters '<' & '>'
 	//response.substring(1, response.length()-1);
+
+	if (response.length() <= 1)
+		return false;
+
+	// Debug
+	#if defined(DEBUG)
+	Serial.print("checkResponse-> ");
+	Serial.print(response);
+	Serial.print("\t length: ");
+	Serial.println(response.length());
+	#endif
 
 	if (response.equalsIgnoreCase("<OK>") || 
 		response.equalsIgnoreCase("<CONNECTED>") ||
@@ -120,9 +215,172 @@ bool HJ580::checkResponse (String response)
 	  return true;
 	else 
 	  return false; 
+	// <INVALID_ERR> 	Instruction does not exist
+	// <LEN_ERR>		The instruction exists, but the instruction length is out of range.
+	// <HT_ERR>			The header and the end of the instruction are incorrect, and < or > is dropped at the beginning and the end.
+	// <RANGE_ERR> 		The command is correct, but the parameter range exceeds the predetermined value.
 }
 
 bool HJ580::checkCommand (String command)
 {
-	checkResponse(writeCommand(command));
+	return checkResponse(writeCommand(command));
+}
+
+
+String HJ580::getMAC ()
+{
+	String mac;
+	// 8 bytes, 2 bytes are '<' & '>', 6 bytes are 48 bit mac address
+	// '<' 0x"11:22:33:44:55::66" '>'
+	size_t bytes = writeCommandBytes("MAC", _buffer, BUFF_SIZE);
+	
+	// Bytes are reversed, mac address are bytes[6-1], byte[7] is '<' and byte[0] is '>'
+	// byte[6]:byte[5]:byte[4]:byte[3]:byte[2]:byte[1]
+
+	if (bytes == 8)
+	{
+		for (int i=6; i>=2; --i)
+			mac += String(_buffer[i], HEX)+ ":";
+		mac += String(_buffer[1], HEX);
+	}
+	else
+		mac = "<DISCONNECTED>";
+
+	return mac;
+}
+
+String HJ580::getPeerMAC ()
+{
+	String mac;
+	// 9 bytes, 2 bytes are '<' & '>', 1 byte is 'P', 6 bytes are 48 bit mac address
+	// '<' 'P' 0x"11:22:33:44:55::66" '>'
+	size_t bytes = writeCommandBytes("PEERMAC", _buffer, BUFF_SIZE);
+	// Bytes are reversed, mac address are bytes[7-2], byte[0] is '<', byte[1] is 'P' and byte[8] is '>'
+ 	// byte[7]:byte[6]:byte[5]:byte[4]:byte[3]:byte[2]
+	if (bytes == 9)
+	{
+		for (int i=6; i>=3; --i)
+			mac += String(_buffer[i], HEX)+ ":";
+		mac += String(_buffer[2], HEX);
+	}
+	else
+		mac = String("<DISCONNECTED>");
+	return mac;
+}
+
+String HJ580::getBondMAC()
+{
+	String mac;
+	// 9 bytes, 2 bytes are '<' & '>', 1 byte is 'B', 6 bytes are 48 bit mac address
+	// '<' 'B' 0x"11:22:33:44:55::66" '>'
+	size_t bytes = writeCommandBytes("RBMAC", _buffer, BUFF_SIZE);
+	// Bytes are ordered, mac address are bytes[7-2], byte[0] is '<', byte[1] is 'B' and byte[8] is '>'
+ 	// mac_addr is byte[2]:byte[3]::byte[4]:byte[5]:byte[6]:byte[7]
+	if (bytes == 9)
+	{
+		for (int i=2; i<=6; ++i)
+			mac += String(_buffer[i], HEX)+ ":";
+		mac += String(_buffer[7], HEX);
+	}
+	else
+		mac = String("<DISCONNECTED>");
+	return mac;
+}
+
+bool HJ580::setBondMAC(String mac)
+{
+	//MAC has to be converted to char format, "0x11" in String would be converted to character in Ascii 
+	//hex 0x -> 61:62:63:64:65:66
+	//string -> a:b:c:d:e:f
+	
+	String macf;
+	uint64_t macl;
+	uint8_t  maci;
+	uint8_t  len = 0;
+	char* str = (char*) mac.c_str();
+	char* pch = strtok(str, ":");
+
+	// Split the string by ':' delimiter, each pch is a byte
+	while(pch != NULL)
+	{
+		if (len > 6)
+		{
+			pch = strtok(NULL, ":");		// Next byte
+			break;							// Exit
+		}
+
+		//Serial.println("pch: " + String(pch));
+		macl = strtoul(pch, NULL, 16);	// Convert str to one byte
+		maci = macl & 0xff;				// Only one byte
+		macf += String((char)maci);		// Reinterpret byte as char
+		pch = strtok(NULL, ":");		// Next byte
+		++len;							// Num bytes converted
+	}
+	
+	// Debug
+	#if defined(DEBUG)
+		Serial.println("Len: " + String(len));
+		Serial.println("init  mac:   " + mac);
+		Serial.println("final mac: 0x" + macf);
+		Serial.println("final mac: 1b");
+		byte* p = (byte*) macf.c_str();
+		while (*p != 0)  { Serial.println(*p, BIN); p++; }
+	#endif
+	
+	if (len == 6)
+		return checkCommand(String("BONDMAC") + macf);	// Question: mac address must be send in order or with bytes reversed?
+	else
+	{
+		_errors += String("BONDMAC MAC address invalid length\n");
+		return false; // Invalid length
+	}
+}
+
+String HJ580::getRSSI () 
+{
+	// Note: rssi has 1 byte, 8 bits, MSBit is signed. so 7 bits represents data. 
+	// <disconnected> message has 14 bytes
+	int rssi;
+	// 4 bytes, 2 bytes are '<' & '>', 1 bytes is 'R' and 1 byte is the rssi value
+	// '<' 'R' 'rssi' '>'
+	size_t bytes = writeCommandBytes("RSSI", _buffer, BUFF_SIZE);
+
+	// Bytes are: byte[0] = '<', byte[1] = 'R', byte[2] = 'RSSIvalue',  byte[3] = '>' 
+	if (bytes == 4)
+		rssi = (int)_buffer[2];
+	else
+		rssi = 0;
+
+	return String(-rssi);
+}
+
+
+void HJ580::setMasterMode()
+{
+	digitalWrite(BLE_RESET, 	LOW);		// System NOT in Reset
+	digitalWrite(BLE_ENABLE, 	LOW);		// Uart RX enabled
+	digitalWrite(BLE_CONFIG, 	LOW);		// Config mode ON.
+	digitalWrite(BLE_MSTR_SLV, 	LOW);		// Master mode
+	softReset();	
+}
+
+void HJ580::setSlaveMode()
+{
+	digitalWrite(BLE_RESET, 	LOW);		// System NOT in Reset
+	digitalWrite(BLE_ENABLE, 	LOW);		// Uart RX enabled
+	digitalWrite(BLE_CONFIG, 	LOW);		// Config mode ON.
+	digitalWrite(BLE_MSTR_SLV, 	HIGH);		// Slave mode
+	softReset();	
+}
+
+
+String HJ580::getErrors()
+{
+	String errors;
+	if (_errors.length() <= 2)
+		_errors = String("\tNONE\n");
+	
+	errors = _errors;
+	_errors = String();
+	return errors;
 }
