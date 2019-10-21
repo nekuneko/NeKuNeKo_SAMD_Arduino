@@ -6,12 +6,13 @@
 
 // PWM Pins
 const int NUMPINS = 26;
-const int testPins [NUMPINS] = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+const int testPins [NUMPINS] = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, LED_BUILTIN,
                                  A0, A1, A2, A3, A4, A7, MISO, MOSI, SCK, SCL, SDA }; // */
 
 // Note:
 // SoK Zero Dawn:  
-//    MISO uses the same timer as D2, MOSI uses the same timer as D3
+//    MISO uses the same timer as D2
+//    MOSI uses the same timer as D3
 //    A4 is DAC (10 bits).
 // 
 // SoK M4 Advance: 
