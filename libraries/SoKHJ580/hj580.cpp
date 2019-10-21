@@ -129,8 +129,10 @@ bool HJ580::writeCommands (String* commands, int32_t numCommands)
 
 		// Debug
 		#if defined(DEBUG)
-		Serial.print(command + ": ");
-		Serial.println(response + "\t");	
+		Serial.print(response);	
+		Serial.print("\t length: ");
+		Serial.print(response.length());
+		Serial.print("\t");
 		#endif
 	}
 
@@ -156,14 +158,16 @@ String HJ580::writeCommand (String command)
 	atmodeON(); // Enter AT Command mode
 
 	command = "<"+command+">";
-	_uart->write(command.c_str()); // Send AT Command
-	response = readCommand(); 			// Receive Acknowledgement
+	_uart->write(command.c_str()); 	// Send AT Command
+	response = readCommand(); 		// Receive Acknowledgement
 
 	// Debug
 	#if defined(DEBUG)
 	Serial.print("writeCommand-> ");
 	Serial.print(command + ": ");
-	Serial.println(response);	
+	Serial.print(response);	
+	Serial.print("\t length: ");
+	Serial.println(response.length());
 	#endif
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
@@ -173,23 +177,58 @@ String HJ580::writeCommand (String command)
 
 size_t HJ580::writeCommandBytes (String command, uint8_t* buffer, int32_t length)
 {
-	size_t response = 0;
+	size_t responseBytes = 0;
 
 	atmodeON(); // Enter AT Command mode
 
 	command = "<"+command+">";
-	_uart->write(command.c_str());					 // Send AT Command
-	response = readCommandBytes(buffer, length); 	// Receive Acknowledgement
+	_uart->write(command.c_str());					 	// Send AT Command
+	responseBytes = readCommandBytes(buffer, length); 	// Receive Acknowledgement
 
 	// Debug
 	#if defined(DEBUG)
 	Serial.print("writeCommandBytes-> ");
 	Serial.print(command + ": ");
-	Serial.println(response);	
+	Serial.print(String((const char*)buffer));	
+	Serial.print("\t length: ");
+	Serial.println(responseBytes);
 	#endif
 
 	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
 
+	return responseBytes;
+}
+
+void printBuffer (uint8_t* buffer, int32_t length)
+{
+	for (int i=0; i<=length-1; ++i)
+		Serial.println("["+String(i)+"]: " + String((char)buffer[i]));
+}
+
+String HJ580::writeBytes (String command, uint8_t* buffer, int32_t bufferLength)
+{
+	String response;
+	uint8_t myBytesLength = 2+command.length() + bufferLength; // '<' '>' + "COMMAND" + "BUFFER" 
+	uint8_t* myBytes = (uint8_t *) malloc(((uint8_t)myBytesLength)*sizeof(uint8_t));
+
+	myBytes[0] = '<';														// '<'
+	memcpy(&myBytes[1], (uint8_t*) command.c_str(), command.length());		// "COMMAND"
+	memcpy(&myBytes[1+command.length()], buffer, bufferLength);				// "BUFFER"
+	myBytes[myBytesLength-1] = '>';											// '>'
+
+	atmodeON(); // Enter AT Command mode
+	_uart->write(myBytes, myBytesLength);	// Send command
+	response = readCommand(); 				// Receive Acknowledgement
+	atmodeOFF(); // Enter Transparent UART mode, turn off AT Command mode
+
+	// Debug
+	#if defined(DEBUG)
+	Serial.println("Sent command: " + command);
+	printBuffer(myBytes, myBytesLength);
+	Serial.println("ACK: " + response);
+	#endif
+
+	free(myBytes);
 	return response;
 }
 
@@ -255,13 +294,13 @@ String HJ580::getPeerMAC ()
 	// 9 bytes, 2 bytes are '<' & '>', 1 byte is 'P', 6 bytes are 48 bit mac address
 	// '<' 'P' 0x"11:22:33:44:55::66" '>'
 	size_t bytes = writeCommandBytes("PEERMAC", _buffer, BUFF_SIZE);
-	// Bytes are reversed, mac address are bytes[7-2], byte[0] is '<', byte[1] is 'P' and byte[8] is '>'
- 	// byte[7]:byte[6]:byte[5]:byte[4]:byte[3]:byte[2]
+	// Bytes are ordered, mac address are bytes[7-2], byte[0] is '<', byte[1] is 'P' and byte[8] is '>'
+ 	// mac_addr is byte[2]:byte[3]::byte[4]:byte[5]:byte[6]:byte[7]
 	if (bytes == 9)
 	{
-		for (int i=6; i>=3; --i)
+		for (int i=2; i<=6; ++i)
 			mac += String(_buffer[i], HEX)+ ":";
-		mac += String(_buffer[2], HEX);
+		mac += String(_buffer[7], HEX);
 	}
 	else
 		mac = String("<DISCONNECTED>");
@@ -287,48 +326,34 @@ String HJ580::getBondMAC()
 	return mac;
 }
 
-bool HJ580::setBondMAC(String mac)
+
+bool HJ580::setBondMAC(const String& mac)
 {
 	//MAC has to be converted to char format, "0x11" in String would be converted to character in Ascii 
 	//hex 0x -> 61:62:63:64:65:66
 	//string -> a:b:c:d:e:f
-	
-	String macf;
-	uint64_t macl;
-	uint8_t  maci;
-	uint8_t  len = 0;
-	char* str = (char*) mac.c_str();
-	char* pch = strtok(str, ":");
 
-	// Split the string by ':' delimiter, each pch is a byte
-	while(pch != NULL)
-	{
-		if (len > 6)
-		{
-			pch = strtok(NULL, ":");		// Next byte
-			break;							// Exit
-		}
+	uint8_t macBytes[6];
+	char* cmac =new char[mac.length()+1];
+	char* pc;
 
-		//Serial.println("pch: " + String(pch));
-		macl = strtoul(pch, NULL, 16);	// Convert str to one byte
-		maci = macl & 0xff;				// Only one byte
-		macf += String((char)maci);		// Reinterpret byte as char
-		pch = strtok(NULL, ":");		// Next byte
-		++len;							// Num bytes converted
+	strcpy(cmac, mac.c_str());
+
+	// Extract string bytes by delimiter ':'
+	pc = strtok(cmac, ":");
+	uint8_t i = 0;
+	while(pc!=0) {
+		if (i>=6)
+			break;
+		macBytes[i] = (char) strtoul(pc, NULL, 16) & 0xff;
+		pc = strtok(NULL, ":");
+		++i;
 	}
-	
-	// Debug
-	#if defined(DEBUG)
-		Serial.println("Len: " + String(len));
-		Serial.println("init  mac:   " + mac);
-		Serial.println("final mac: 0x" + macf);
-		Serial.println("final mac: 1b");
-		byte* p = (byte*) macf.c_str();
-		while (*p != 0)  { Serial.println(*p, BIN); p++; }
-	#endif
-	
-	if (len == 6)
-		return checkCommand(String("BONDMAC") + macf);	// Question: mac address must be send in order or with bytes reversed?
+
+	delete[] cmac;
+
+	if (i == 6)
+		return checkCommand(writeBytes("BONDMAC", macBytes, sizeof(macBytes))); // Question: mac address must be send in order or with bytes reversed?
 	else
 	{
 		_errors += String("BONDMAC MAC address invalid length\n");

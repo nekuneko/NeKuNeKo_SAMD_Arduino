@@ -3,13 +3,16 @@
 // User constants
 #if defined(_VARIANT_SOK_ZERO_DAWN_)
 const String DEVICE_NAME = "SoK Zero Dawn";
+const String MANUFACTURER_NAME = "NeKuNeKo Inc.";
 #elif defined(_VARIANT_SOK_M4_ADVANCE_)
 const String DEVICE_NAME = "SoK M4 Advance";
+const String MANUFACTURER_NAME = "NeKuNeKo Inc.";
 #else
-const String DEVICE_NAME = "HJ-580XP"; // Edit with your device name
+const String DEVICE_NAME = "HJ-580XP_EE"; // Edit with your device name
+const String MANUFACTURER_NAME = "FACTORY NAME";
 #endif
 const uint32_t BAUD_RATE = 115200;
-const String   MANUFACTURER_NAME = "NeKuNeKo Inc.";
+
 
 // Sketch variables
 HJ580 ble; 
@@ -74,18 +77,24 @@ void setup()
   Serial.print(ble.getErrors());
 
   /*/ Test Master Mode
-  ble.setMasterMode();
-  ble.setBondMAC("66:55:44:33:22:11"); // */
+  //ble.setMasterMode();
+  //ble.setBondMAC("00:00:00:00:00:00");
+  //ble.setBondMAC("01:02:03:04:05:06");
+  //ble.setSlaveMode();
+  Serial.println("Bond MAC: "+ble.getBondMAC()); // */
   
   // BLE additional information
-  showAdditionalInfo();
+  showAdditionalInfo(); // */
+
+  /*/ Wait for testing
+  while(true); // */
   
   /*/ Initial configuration batch commands
   Serial.println("Performing initial configuration commands");
   const int NUM_COMMANDS = 3;
   String commands[NUM_COMMANDS] = {  
               String("NAME")+DEVICE_NAME, 
-              String("FAC") +MANUFACTURER_NAME), 
+              String("FAC") +MANUFACTURER_NAME, 
               String("DISCONNECT")
             };
   ble.writeCommands(commands, NUM_COMMANDS);
@@ -109,11 +118,11 @@ void setup()
   // DigitalRead LOW  -> Connected
   // DigitalRead HIGH -> Disconnected
   pinMode(BLE_STATE, INPUT_PULLUP);
-  attachInterrupt(BLE_STATE, ISR, CHANGE);
+  attachInterrupt(BLE_STATE, ISR, CHANGE); // */
 
   // Power on LED builtin
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(LED_BUILTIN, LOW); // */
 } // end setup()
 
 

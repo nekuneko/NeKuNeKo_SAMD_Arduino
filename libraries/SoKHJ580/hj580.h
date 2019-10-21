@@ -18,7 +18,7 @@ public:
   bool begin     (Uart* u = &Serial2, uint32_t finalBaudrate = 115200);
   void hardReset (uint16_t timeReset = 50);   // Hardware Reset
   void softReset (uint16_t timeReset = 50);   // Software Reset
-  bool setBondMAC(String mac = "11:22:33:44:55:66"); 
+  bool setBondMAC(const String& mac = "11:22:33:44:55:66"); 
   void setMasterMode(void);
   void setSlaveMode (void);
   
@@ -29,6 +29,7 @@ public:
   size_t readCommandBytes  (uint8_t* buffer, int32_t length, uint16_t timeout = 20);
   String writeCommand      (String command);
   size_t writeCommandBytes (String command, uint8_t* buffer, int32_t length);
+  String writeBytes        (String command, uint8_t* buffer, int32_t bufferLength);
   bool   writeCommands (String* commands, int32_t numCommands);
   bool   checkCommand  (String  command);
   bool   checkResponse (String  response);
