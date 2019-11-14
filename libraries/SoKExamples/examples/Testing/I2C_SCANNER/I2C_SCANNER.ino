@@ -10,6 +10,12 @@ void setup()
   
   while (!Serial);            
   Serial.println("\nI2C Scanner");
+
+  /*/ Enable this lines if you are testing I2C devices on 
+  // NeKuNeKo's SoK Radio Station in order to enable Si4713
+  pinMode(SOK, OUTPUT);
+  digitalWrite(SOK, HIGH);
+  // */
 }
 
 
