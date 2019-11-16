@@ -107,9 +107,9 @@ const PinDescription g_APinDescription[]=
 
   // 49...51 Primary SPI pins (EXTERNAL SPI: MOSI, SCK, MISO)
   // ----------------------
-  { PORTA, 31, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER_ALT),               No_ADC_Channel,  PWM1_CH1,   TCC1_CH1,     EXTERNAL_INT_11 },    // 49 MOSI   ALT_SERCOM1/PAD[3] /          /                / INT_11 / (SPI_MOSI, EXTERNAL)
-  { PORTA, 17, PIO_SERCOM,      (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                   No_ADC_Channel,  PWM2_CH1,   TCC2_CH1,     EXTERNAL_INT_1  },    // 50 SCK        SERCOM1/PAD[1] /          /    TCC2_WO[1]  / INT_1  / (SPI_SCK,  EXTERNAL) 
-  { PORTA, 30, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER_ALT),               No_ADC_Channel,  PWM1_CH0,   TCC1_CH0,     EXTERNAL_INT_10 },    // 51 MISO   ALT_SERCOM1/PAD[2] /          /                / INT_10 / (SPI_MISO, EXTERNAL) 
+  { PORTA, 31, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                   No_ADC_Channel,  PWM1_CH1,   TCC1_CH1,     EXTERNAL_INT_11 },    // 49 MOSI   ALT_SERCOM1/PAD[3] /         /  TCC1_WO[1]* / INT_11 / (SPI_MOSI, EXTERNAL) *Same timer as D3
+  { PORTA, 17, PIO_SERCOM,      (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                   No_ADC_Channel,  PWM2_CH1,   TCC2_CH1,     EXTERNAL_INT_1  },    // 50 SCK        SERCOM1/PAD[1] /         /  TCC2_WO[1]  / INT_1  / (SPI_SCK,  EXTERNAL) 
+  { PORTA, 30, PIO_SERCOM_ALT,  (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                   No_ADC_Channel,  PWM1_CH0,   TCC1_CH0,     EXTERNAL_INT_10 },    // 51 MISO   ALT_SERCOM1/PAD[2] /         /  TCC1_WO[0]* / INT_10 / (SPI_MISO, EXTERNAL) *Same timer as D2
 
   // 52...54 Secondary SPI pins (INTERNAL SPI1: MOSI1, SCK1, MISO1)
   // ----------------------
