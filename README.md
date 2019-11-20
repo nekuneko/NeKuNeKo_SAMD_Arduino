@@ -18,6 +18,11 @@ Just open the (**Tools** > **Board** > **Boards Manager**) and install the packa
 
 **NekuNeko SAMD Boards (32-bit ARM Cortex-M0+)**
 
+## Supported boards
+
+* SoK Zero Dawn (ATSAMD21J18A)
+* SoK M4 Advance (ATSAMD51J20A)
+
 ## Support
 
 There is a dedicated section of the Arduino Forum for general discussion and project assistance:
