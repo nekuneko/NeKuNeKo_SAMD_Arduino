@@ -24,6 +24,7 @@ menu.i2s=I2S Audio Port
 menu.spi=SPI SD card
 menu.serialsok=SerialSOK
 
+
 # SoK Zero Dawn Rev 1.5b (SAMD21J18A)
 # ---------------------------------------
 sok_zero_dawn.name=SoK Zero Dawn (SAMD21J18A)
@@ -68,7 +69,8 @@ sok_zero_dawn.menu.serialsok.off=Disabled
 sok_zero_dawn.menu.serialsok.on=Enabled
 sok_zero_dawn.menu.serialsok.on.build.flags.serialsok=-DUSE_SERIAL_SOK
 
-# SoK M4 Advance 1.5b (SAMD51J20A)
+
+# SoK M4 Advance 1.6b (SAMD51J20A)
 # ---------------------------------------
 sok_m4_advance.name=SoK M4 Advance (SAMD51J20A)
 sok_m4_advance.vid.0=0x1993
@@ -141,3 +143,80 @@ sok_m4_advance.menu.i2s.ext.build.flags.i2s=-DUSE_EXTERNAL_I2S
 sok_m4_advance.menu.serialsok.off=Disabled
 sok_m4_advance.menu.serialsok.on=Enabled
 sok_m4_advance.menu.serialsok.on.build.flags.serialsok=-DUSE_SERIAL_SOK
+
+
+# Kitten Display (SAMD21E18A)
+# ------------------------------
+kitten_display.name=Kitten Display (SAMD21E18A)
+kitten_display.vid.0=0x1993
+kitten_display.pid.0=0x0319
+kitten_display.vid.1=0x1993
+kitten_display.pid.1=0x0326
+kitten_display.upload.tool=bossac
+kitten_display.upload.protocol=sam-ba
+kitten_display.upload.maximum_size=262144
+kitten_display.upload.offset=0x2000
+kitten_display.upload.use_1200bps_touch=true
+kitten_display.upload.wait_for_upload_port=true
+kitten_display.upload.native_usb=true
+kitten_display.build.mcu=cortex-m0plus
+kitten_display.build.f_cpu=48000000L
+kitten_display.build.usb_product="Kitten Display"
+kitten_display.build.usb_manufacturer="NeKuNeKo"
+kitten_display.build.board=SAMD_KITTEN_DISPLAY
+kitten_display.build.core=arduino
+kitten_display.build.extra_flags=-DCRYSTALLESS -Dkitten_display -D__SAMD21E18A__ -DARM_MATH_CM0PLUS {build.usb_flags}
+kitten_display.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+kitten_display.build.openocdscript=openocd_scripts/kitten_display.cfg
+kitten_display.build.variant=kitten_display
+kitten_display.build.variant_system_lib=
+kitten_display.build.vid=0x1993
+kitten_display.build.pid=0x0319
+kitten_display.bootloader.tool=openocd
+kitten_display.bootloader.file=kitten_display/bootloader-itsybitsy_m0-v2.0.0-adafruit.5.bin
+kitten_display.menu.usbstack.arduino=Arduino
+kitten_display.menu.usbstack.tinyusb=TinyUSB
+kitten_display.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
+kitten_display.menu.debug.off=Off
+kitten_display.menu.debug.on=On
+kitten_display.menu.debug.on.build.flags.debug=-g
+
+
+# Kitten Syringe (SAMD21E18A)
+# ------------------------------
+kitten_syringe.name=Kitten Syringe (SAMD21E18A)
+kitten_syringe.vid.0=0x1993
+kitten_syringe.pid.0=0x0419
+kitten_syringe.vid.1=0x1993
+kitten_syringe.pid.1=0x0426
+kitten_syringe.upload.tool=bossac
+kitten_syringe.upload.protocol=sam-ba
+kitten_syringe.upload.maximum_size=262144
+kitten_syringe.upload.offset=0x2000
+kitten_syringe.upload.use_1200bps_touch=true
+kitten_syringe.upload.wait_for_upload_port=true
+kitten_syringe.upload.native_usb=true
+kitten_syringe.build.mcu=cortex-m0plus
+kitten_syringe.build.f_cpu=48000000L
+kitten_syringe.build.usb_product="Kitten Syringe"
+kitten_syringe.build.usb_manufacturer="NeKuNeKo"
+kitten_syringe.build.board=SAMD_KITTEN_SYRINGE
+kitten_syringe.build.core=arduino
+kitten_syringe.build.extra_flags=-DCRYSTALLESS -Dkitten_syringe -D__SAMD21E18A__ -DARM_MATH_CM0PLUS {build.usb_flags}
+kitten_syringe.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+kitten_syringe.build.openocdscript=openocd_scripts/kitten_syringe.cfg
+kitten_syringe.build.variant=kitten_syringe
+kitten_syringe.build.variant_system_lib=
+kitten_syringe.build.vid=0x1993
+kitten_syringe.build.pid=0x0419
+kitten_syringe.bootloader.tool=openocd
+kitten_syringe.bootloader.file=kitten_syringe/bootloader-itsybitsy_m0-v2.0.0-adafruit.5.bin
+kitten_syringe.menu.usbstack.arduino=Arduino
+kitten_syringe.menu.usbstack.tinyusb=TinyUSB
+kitten_syringe.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
+kitten_syringe.menu.debug.off=Off
+kitten_syringe.menu.debug.on=On
+kitten_syringe.menu.debug.on.build.flags.debug=-g
+
+
+

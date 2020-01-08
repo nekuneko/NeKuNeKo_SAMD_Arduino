@@ -22,6 +22,8 @@ Just open the (**Tools** > **Board** > **Boards Manager**) and install the packa
 
 * SoK Zero Dawn (ATSAMD21J18A)
 * SoK M4 Advance (ATSAMD51J20A)
+* Kitten Display (ATSAMD21E18A)
+* Kitten Syringe (ATSAMD21E18A)
 
 ## Support
 
