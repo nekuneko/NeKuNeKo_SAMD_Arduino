@@ -58,7 +58,7 @@ const PinDescription g_APinDescription[]=
 
 
 
-  // 16...24 - Analog pins (digitals hidden also)
+  // 16...25 - Analog pins (digitals hidden also)
   // --------------------
   { PORTA,  4, PIO_SERCOM_ALT,  (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),    ADC_Channel4,  PWM0_CH0,   TCC0_CH0,     EXTERNAL_INT_4 },     // 16 A0  ALT_SERCOM0_PAD[0]  / AIN[4]  /     TCC0_WO[0] / INT_4  
   { PORTA,  5, PIO_SERCOM_ALT,  (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),    ADC_Channel5,  PWM0_CH1,   TCC0_CH1,     EXTERNAL_INT_5 },     // 17 A1  ALT_SERCOM0_PAD[1]  / AIN[5]  /     TCC0_WO[1] / INT_5 
