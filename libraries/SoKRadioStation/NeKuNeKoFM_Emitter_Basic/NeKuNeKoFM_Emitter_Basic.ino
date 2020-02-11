@@ -23,44 +23,47 @@
 #include <Adafruit_Si4713.h>
 #define _BV(n) (1 << n)
 
-#define RESETPIN SOK
+#define SI471X_CMD_DEBUG
+//#define RESETPIN D13 // SoK
+#define RESETPIN D10 // Kitten Syringe
+//#define RESETPIN D4  // Kitten Display
+
 
 #define FMSTATION 10230      // 10230 == 102.30 MHz
 
 Adafruit_Si4713 radio = Adafruit_Si4713(RESETPIN);
 
-bool isAlive ()
+void setup() 
 {
-  Wire.beginTransmission(0x11);
-  byte error = Wire.endTransmission();
-
-  if (error)
-    return false;
-  else 
-    return true;
-}
-
-
-void setup() {
-  Serial.begin(9600);
-  while(!Serial); // wait until Arduino Serial Monitor is open
+  digitalWrite(RESETPIN, LOW);
+  delay(500);
+  digitalWrite(RESETPIN, HIGH);
+  
+  Serial.begin(115200); // 
+  //while(!Serial); // wait until Arduino Serial Monitor is open */
   Serial.println("NeKuNeKo's SoK Radio Station - Si4713 Test");
-
-  while (! radio.begin(0x11)) {  // begin with address 0x11 (CS low)
+  
+  while (! radio.begin(0x11, &Wire)) {  // begin with address 0x11 (CS low)
     Serial.println("Couldn't find radio?");
     delay (1000);
   }
 
-  /*/ Uncomment to scan power of entire range from 87.5 to 108.0 MHz
+  // Show IC information
+  radio.getRev();
+  radio.setGPIOctrl(_BV(1) | _BV(2));  // set GP1 and GP2 to output
+  //radio.setGPIO(_BV(1) | _BV(2));      // turn ON Both leds
+  uint8_t stat = radio.getStatus();
+  Serial.print("status: 0x");
+  Serial.println(stat, HEX); 
   
+  /*/ Uncomment to scan power of entire range from 87.5 to 108.0 MHz
   for (uint16_t f  = 8750; f<10800; f+=10) {
    radio.readTuneMeasure(f);
    Serial.print("Measuring "); Serial.print(f); Serial.print("...");
    radio.readTuneStatus();
    Serial.println(radio.currNoiseLevel);
-   }
-   */
-
+  } //*/
+  
   Serial.print("\nSet TX power");
   radio.setTXpower(115);  // dBuV, 88-115 max
 
@@ -85,24 +88,22 @@ void setup() {
   radio.setRDSbuffer( "NeKuNeKo's SoK Radio Station");
 
   Serial.println("RDS on!");  
-
-  radio.setGPIOctrl(_BV(1) | _BV(2));  // set GP1 and GP2 to output
 }
 
 
 
-void loop() {
-  if (!isAlive())
-    Serial.println("CONNECTION LOST WITH FM TRANSMITTER");
-    
+void loop() 
+{    
   radio.readASQ();
   Serial.print("\tCurr ASQ: 0x"); 
   Serial.println(radio.currASQ, HEX);
   Serial.print("\tCurr InLevel:"); 
   Serial.println(radio.currInLevel);
-  // toggle GPO1 and GPO2
+  Serial.println();
+  
+  /*/ toggle GPO1 and GPO2
   radio.setGPIO(_BV(1));
   delay(500);
   radio.setGPIO(_BV(2));
-  delay(500);
+  delay(500); //*/
 }
