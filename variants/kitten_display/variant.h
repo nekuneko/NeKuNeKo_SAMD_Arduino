@@ -166,7 +166,7 @@ static const uint8_t ATN =  PIN_ATN;
 /*
  * SPI Interfaces
  */
-#define SPI_INTERFACES_COUNT 1
+#define SPI_INTERFACES_COUNT 2
 
 // Primary SPI pins (SPI) - SERCOM1
 #define PIN_SPI_MOSI         (28u)

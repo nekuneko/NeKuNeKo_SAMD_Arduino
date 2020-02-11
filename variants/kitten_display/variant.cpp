@@ -127,16 +127,17 @@ SERCOM sercom3( SERCOM3 ) ; // Serial1
 
 
 Uart Serial1   ( &sercom3, PIN_SERIAL1_RX,   PIN_SERIAL1_TX,   PAD_SERIAL1_RX,   PAD_SERIAL1_TX   );
-Uart SerialSOK ( &sercom2, PIN_SERIALSOK_RX, PIN_SERIALSOK_TX, PAD_SERIALSOK_RX, PAD_SERIALSOK_TX ); // Alternative use of SERCOM 2
+//Uart SerialSOK ( &sercom2, PIN_SERIALSOK_RX, PIN_SERIALSOK_TX, PAD_SERIALSOK_RX, PAD_SERIALSOK_TX ); // Alternative use of SERCOM 2
 
 
 
 #if defined (USE_SERIAL_SOK)
-#warning Wire I2C interface won't be available meanwhile you use SerialSOK
+#warning Wire I2C interface won't be available meanwhile you use SerialSOK 
+/*
 void SERCOM2_Handler()
 {
   SerialSOK.IrqHandler();
-}
+}*/
 #endif
 
 void SERCOM3_Handler()
