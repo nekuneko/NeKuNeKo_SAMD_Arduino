@@ -53,7 +53,7 @@ sok_zero_dawn.build.variant_system_lib=
 sok_zero_dawn.build.vid=0x1993
 sok_zero_dawn.build.pid=0x0119
 sok_zero_dawn.bootloader.tool=openocd
-sok_zero_dawn.bootloader.file=sok_zero_dawn/bootloader-sok_zero_dawn-v3.7.0-30-gb7dffef.bin
+sok_zero_dawn.bootloader.file=sok_zero_dawn/bootloader-sok_zero_dawn-v3.7.0-67-ge50b44a-dirty.bin
 sok_zero_dawn.menu.debug.off=Off
 sok_zero_dawn.menu.debug.on=On
 sok_zero_dawn.menu.debug.on.build.flags.debug=-g -DDEBUG
@@ -97,7 +97,7 @@ sok_m4_advance.build.variant_system_lib=
 sok_m4_advance.build.vid=0x1993
 sok_m4_advance.build.pid=0x0219
 sok_m4_advance.bootloader.tool=openocd
-sok_m4_advance.bootloader.file=sok_m4_advance/bootloader-sok_m4_advance-v3.7.0-30-gb7dffef.bin
+sok_m4_advance.bootloader.file=sok_m4_advance/bootloader-sok_m4_advance-v3.7.0-67-ge50b44a-dirty.bin
 sok_m4_advance.compiler.arm.cmsis.ldflags="-L{build.variant.path}" -larm_cortexM4lf_math -mfloat-abi=hard -mfpu=fpv4-sp-d16
 sok_m4_advance.menu.cache.on=Enabled
 sok_m4_advance.menu.cache.on.build.cache_flags=-DENABLE_CACHE
@@ -132,11 +132,11 @@ sok_m4_advance.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
 sok_m4_advance.menu.debug.off=Off
 sok_m4_advance.menu.debug.on=On
 sok_m4_advance.menu.debug.on.build.flags.debug=-g -DDEBUG
-sok_m4_advance.menu.spi.int=Use internal SPI
+sok_m4_advance.menu.spi.int=Use internal SPI1
 sok_m4_advance.menu.spi.int.build.flags.spi=-DUSE_INTERNAL_SPI
 sok_m4_advance.menu.spi.ext=Use external SPI
 sok_m4_advance.menu.spi.ext.build.flags.spi=-DUSE_EXTERNAL_SPI
-sok_m4_advance.menu.i2s.int=Use internal I2S
+sok_m4_advance.menu.i2s.int=Use internal I2S1
 sok_m4_advance.menu.i2s.int.build.flags.i2s=-DUSE_INTERNAL_I2S
 sok_m4_advance.menu.i2s.ext=Use external I2S
 sok_m4_advance.menu.i2s.ext.build.flags.i2s=-DUSE_EXTERNAL_I2S
@@ -173,13 +173,17 @@ kitten_display.build.variant_system_lib=
 kitten_display.build.vid=0x1993
 kitten_display.build.pid=0x0319
 kitten_display.bootloader.tool=openocd
-kitten_display.bootloader.file=kitten_display/bootloader-itsybitsy_m0-v2.0.0-adafruit.5.bin
+kitten_display.bootloader.file=kitten_display/bootloader-kitten_display-v3.7.0-67-ge50b44a-dirty.bin
 kitten_display.menu.usbstack.arduino=Arduino
 kitten_display.menu.usbstack.tinyusb=TinyUSB
 kitten_display.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
 kitten_display.menu.debug.off=Off
 kitten_display.menu.debug.on=On
-kitten_display.menu.debug.on.build.flags.debug=-g
+kitten_display.menu.debug.on.build.flags.debug=-g -DDEBUG
+kitten_display.menu.spi.ext=Use Primary SPI
+kitten_display.menu.spi.ext.build.flags.spi=-DUSE_PRIMARY_SPI
+kitten_display.menu.spi.int=Use Secondary SPI1
+kitten_display.menu.spi.int.build.flags.spi=-DUSE_SECONDARY_SPI
 
 
 # Kitten Syringe (SAMD21E18A)
@@ -210,13 +214,17 @@ kitten_syringe.build.variant_system_lib=
 kitten_syringe.build.vid=0x1993
 kitten_syringe.build.pid=0x0419
 kitten_syringe.bootloader.tool=openocd
-kitten_syringe.bootloader.file=kitten_syringe/bootloader-itsybitsy_m0-v2.0.0-adafruit.5.bin
+kitten_syringe.bootloader.file=kitten_syringe/bootloader-kitten_syringe-v3.7.0-67-ge50b44a-dirty.bin
 kitten_syringe.menu.usbstack.arduino=Arduino
 kitten_syringe.menu.usbstack.tinyusb=TinyUSB
 kitten_syringe.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
 kitten_syringe.menu.debug.off=Off
 kitten_syringe.menu.debug.on=On
-kitten_syringe.menu.debug.on.build.flags.debug=-g
+kitten_syringe.menu.debug.on.build.flags.debug=-g -DDEBUG
+kitten_syringe.menu.spi.ext=Use Primary SPI
+kitten_syringe.menu.spi.ext.build.flags.spi=-DUSE_PRIMARY_SPI
+kitten_syringe.menu.spi.int=Use Secondary SPI1
+kitten_syringe.menu.spi.int.build.flags.spi=-DUSE_SECONDARY_SPI
 
 
 
