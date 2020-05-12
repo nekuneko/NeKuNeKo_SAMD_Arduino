@@ -60,6 +60,7 @@ class Adafruit_USBD_Device
 
     void setID(uint16_t vid, uint16_t pid);
     void setVersion(uint16_t bcd);
+    void setDeviceVersion(uint16_t bcd);
 
     void setLanguageDescriptor(uint16_t language_id);
     void setManufacturerDescriptor(const char *s);
@@ -81,8 +82,8 @@ class Adafruit_USBD_Device
 
     //------------- Platform Dependent APIs -------------//
     uint8_t getSerialDescriptor(uint16_t* serial_str);
-    void detach(void); // physical detach by disable pull-up
-    void attach(void); // physical attach by enable pull-up
+    bool detach(void); // physical detach by disable pull-up
+    bool attach(void); // physical attach by enable pull-up
 };
 
 extern Adafruit_USBD_Device USBDevice;

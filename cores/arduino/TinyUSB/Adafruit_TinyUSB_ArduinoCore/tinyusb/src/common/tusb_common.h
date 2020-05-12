@@ -39,8 +39,8 @@
 // Macros Helper
 //--------------------------------------------------------------------+
 #define TU_ARRAY_SIZE(_arr)   ( sizeof(_arr) / sizeof(_arr[0]) )
-#define TU_MIN(_x, _y)        ( (_x) < (_y) ) ? (_x) : (_y) )
-#define TU_MAX(_x, _y)        ( (_x) > (_y) ) ? (_x) : (_y) )
+#define TU_MIN(_x, _y)        ( ( (_x) < (_y) ) ? (_x) : (_y) )
+#define TU_MAX(_x, _y)        ( ( (_x) > (_y) ) ? (_x) : (_y) )
 
 #define TU_U16_HIGH(u16)      ((uint8_t) (((u16) >> 8) & 0x00ff))
 #define TU_U16_LOW(u16)       ((uint8_t) ((u16)       & 0x00ff))
@@ -222,13 +222,17 @@ void tu_print_mem(void const *buf, uint16_t count, uint8_t indent);
 // Log with debug level 1
 #define TU_LOG1               tu_printf
 #define TU_LOG1_MEM           tu_print_mem
-#define TU_LOG1_LOCATION()    tu_printf("%s: %d:\n", __PRETTY_FUNCTION__, __LINE__)
+#define TU_LOG1_LOCATION()    tu_printf("%s: %d:\r\n", __PRETTY_FUNCTION__, __LINE__)
+#define TU_LOG1_INT(x)        tu_printf(#x " = %ld\n", (uint32_t) (x) )
+#define TU_LOG1_HEX(x)        tu_printf(#x " = %lX\n", (uint32_t) (x) )
 
 // Log with debug level 2
 #if CFG_TUSB_DEBUG > 1
   #define TU_LOG2             TU_LOG1
   #define TU_LOG2_MEM         TU_LOG1_MEM
   #define TU_LOG2_LOCATION()  TU_LOG1_LOCATION()
+  #define TU_LOG2_INT         TU_LOG1_INT
+  #define TU_LOG2_HEX         TU_LOG1_HEX
 #endif
 
 
