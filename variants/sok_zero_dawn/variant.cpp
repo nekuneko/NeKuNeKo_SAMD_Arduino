@@ -65,7 +65,7 @@ const PinDescription g_APinDescription[]=
   { PORTA, 19, PIO_OUTPUT,      (PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),                    No_ADC_Channel, PWM3_CH1,   TC3_CH1,      EXTERNAL_INT_3  },    // 20 D20                      /         /     TC3_WO[1]  / INT_3* / (I2S_SD[0])
   { PORTA, 20, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4  },    // 21 D21                      /         /                / INT_4* / (I2S_SCK[0])
   { PORTA, 21, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5  },    // 22 D22                      /         /                / INT_5* / (I2S_FS[0]) 
-  { PORTA, 18, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2  },    // 23 D23                      /         /                / INT_2* / (NC)
+  { PORTA, 18, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2  },    // 23 D23                      /         /                / INT_2  / (INT_IMU)
   { PORTB, 16, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                                                No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0  },    // 24 D24                      /         /                / INT_0  / (INT_APDS)
 
 
@@ -73,7 +73,7 @@ const PinDescription g_APinDescription[]=
   // --------------------
   { PORTB,  0, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel8,  PWM7_CH0,   TC7_CH0,      EXTERNAL_INT_0 },     // 25 A0                       / AIN[8]  /     TC7/WO[0]  / INT_0* (Taken by INT_APDS)
   { PORTB,  1, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel9,  PWM7_CH1,   TC7_CH1,      EXTERNAL_INT_1 },     // 26 A1                       / AIN[9]  /     TC7/WO[1]  / INT_1* (Taken by BLE_STATE)
-  { PORTB,  2, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel10, PWM6_CH0,   TC6_CH0,      EXTERNAL_INT_2 },     // 27 A2                       / AIN[10] /     TC6/WO[0]  / INT_2
+  { PORTB,  2, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel10, PWM6_CH0,   TC6_CH0,      EXTERNAL_INT_2 },     // 27 A2                       / AIN[10] /     TC6/WO[0]  / INT_2* (Taken by INT_IMU)
   { PORTB,  3, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL|PIN_ATTR_PWM|PIN_ATTR_TIMER),     ADC_Channel11, PWM6_CH1,   TC6_CH1,      EXTERNAL_INT_3 },     // 28 A3                       / AIN[11] /     TC6/WO[1]  / INT_3
   { PORTA,  2, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel0,  NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2 },     // 29 A4                       / AIN[0]  /                / INT_2*
   { PORTB,  4, PIO_ANALOG,      (PIN_ATTR_ANALOG|PIN_ATTR_DIGITAL),                                 ADC_Channel12, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4 },     // 30 A5                       / AIN[12] /                / INT_4
@@ -151,12 +151,12 @@ const void* g_apTCInstances[TCC_INST_NUM+TC_INST_NUM]={ TCC0, TCC1, TCC2, TC3, T
 
 
 // Multi-serial objects instantiation
-SERCOM sercom0( SERCOM0 ) ;
-SERCOM sercom1( SERCOM1 ) ;
-SERCOM sercom2( SERCOM2 ) ;
-SERCOM sercom3( SERCOM3 ) ;
-SERCOM sercom4( SERCOM4 ) ;
-SERCOM sercom5( SERCOM5 ) ;
+SERCOM sercom0( SERCOM0 ) ; // Serial1
+SERCOM sercom1( SERCOM1 ) ; // SPI
+SERCOM sercom2( SERCOM2 ) ; // SPI1
+SERCOM sercom3( SERCOM3 ) ; // Wire1
+SERCOM sercom4( SERCOM4 ) ; // Wire - SerialSOK
+SERCOM sercom5( SERCOM5 ) ; // Serial2
 
 
 Uart Serial1   ( &sercom0, PIN_SERIAL1_RX,   PIN_SERIAL1_TX,   PAD_SERIAL1_RX,   PAD_SERIAL1_TX   );
@@ -164,19 +164,27 @@ Uart Serial2   ( &sercom5, PIN_SERIAL2_RX,   PIN_SERIAL2_TX,   PAD_SERIAL2_RX,  
 Uart SerialSOK ( &sercom4, PIN_SERIALSOK_RX, PIN_SERIALSOK_TX, PAD_SERIALSOK_RX, PAD_SERIALSOK_TX ); // Alternative use of SERCOM 4
 
 
+// SERCOM 0 - Serial1
 void SERCOM0_Handler()
 {
   Serial1.IrqHandler();
 } 
 
-#if defined (USE_SERIAL_SOK)
-#warning External Wire I2C interface won't be available meanwhile you use SerialSOK
-void SERCOM4_Handler()
-{
-  SerialSOK.IrqHandler();
-}
+// SERCOM 1 - SPI
+// SERCOM 2 - SPI1
+// SERCOM 3 - I2C1
+
+// SERCOM 4 - I2C - SerialSOK
+#if defined (USE_SERIAL_OVER_I2C)
+  #warning Wire/Wire1 I2C/I2C1 interfaces won't be available meanwhile you use SerialSOK (Serial Over I2C)
+
+  void SERCOM4_Handler()
+  {
+    SerialSOK.IrqHandler();
+  }
 #endif
 
+// SERCOM 5 - Serial2
 void SERCOM5_Handler()
 {
   Serial2.IrqHandler();

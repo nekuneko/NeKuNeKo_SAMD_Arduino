@@ -63,8 +63,6 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-	PROVIDE(__sodaq_firmware_state = ORIGIN(FLASH) - 0x100);
-
 	.text :
 	{
 		__text_start__ = .;
@@ -91,7 +89,6 @@ SECTIONS
 
 		*(.rodata*)
 
-		KEEP(*(.sodaq_keep))
 		KEEP(*(.eh_frame*))
 	} > FLASH
 

@@ -67,9 +67,6 @@ SECTIONS
 	{
 		__text_start__ = .;
 
-		KEEP(*(.sketch_boot))
-
-		. = ALIGN(0x2000);
 		KEEP(*(.isr_vector))
 		*(.text*)
 

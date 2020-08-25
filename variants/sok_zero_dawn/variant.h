@@ -81,21 +81,10 @@ extern "C"
 // Pin not defined
 #define NOT_CONNECTED_PIN   (62u)
 
-// BLE control pins
-#define BLE_RESET    (15u)
-#define BLE_ENABLE   (16u)
-#define BLE_CONFIG   (17u)
-#define BLE_MSTR_SLV (18u)
-#define BLE_STATE    (19u)
-
-// APDS Interupt
-#define INT_APDS     (24u)
-
 // LEDs
 #define PIN_LED_13           (14u)
 #define PIN_LED              PIN_LED_13
 #define LED_BUILTIN          PIN_LED_13
-
 
 /*
  * Digital pins
@@ -125,7 +114,6 @@ static const uint8_t D21  = 21; // I2S_SCK0
 static const uint8_t D22  = 22; // I2S_FS0
 static const uint8_t D23  = 23; // NC
 static const uint8_t D24  = 24; // INT_APDS
-
 
 /*
  * Analog pins
@@ -183,27 +171,57 @@ static const uint8_t DAC0 = PIN_DAC0;
 #define PIN_ATN             NOT_CONNECTED_PIN   // -- unsed, arduino zero default is on 38ul, PA13
 static const uint8_t ATN =  PIN_ATN;
 
+// BLE control pins
+#define BLE_RESET    (15u)
+#define BLE_ENABLE   (16u)
+#define BLE_CONFIG   (17u)
+#define BLE_MSTR_SLV (18u)
+#define BLE_STATE    (19u)
+
+// APDS Interupt
+#define INT_APDS     (24u) // PB16
+
+// IMU Interrupt
+#define INT_IMU      (23u) // PA18
+
+// FingerSoK Interfaces custom pins
+#define FSP_IRQ      (50u) // SCK
+#define FSP_RST      NOT_CONNECTED_PIN
+
+#define FSC_IRQ      (13u)
+#define FSC_RST      (9u)
+
+#define FSS_IRQ      (7u)
+#define FSS_RST      NOT_CONNECTED_PIN
+
+
 
 /*
  * Serial interfaces
  */
-// Serial1 (D0/D1) - SERCOM0
-#define PIN_SERIAL1_TX      (0ul)
-#define PIN_SERIAL1_RX      (1ul)
-#define PAD_SERIAL1_TX      (UART_TX_PAD_0)
-#define PAD_SERIAL1_RX      (SERCOM_RX_PAD_1)
 
-// Serial2 (Bluetooth BLE_HJ580XP or WiFi) - SERCOM5
-#define PIN_SERIAL2_TX      (55ul)
-#define PIN_SERIAL2_RX      (56ul)
-#define PAD_SERIAL2_TX      (UART_TX_PAD_2)
-#define PAD_SERIAL2_RX      (SERCOM_RX_PAD_3)
+  // Serial (USB) - HID
 
-// SerialSOK (Alternate use of SERCOM4-I2C, TX-SDA, RX-SCL)
-#define PIN_SERIALSOK_TX    (45ul)
-#define PIN_SERIALSOK_RX    (46ul)
-#define PAD_SERIALSOK_TX    (UART_TX_PAD_0)
-#define PAD_SERIALSOK_RX    (SERCOM_RX_PAD_1)
+#define SERIAL_INTERFACES_COUNT 3
+
+  // Serial1 (D0/D1) - SERCOM0
+  #define PIN_SERIAL1_TX      (0ul)
+  #define PIN_SERIAL1_RX      (1ul)
+  #define PAD_SERIAL1_TX      (UART_TX_PAD_0)
+  #define PAD_SERIAL1_RX      (SERCOM_RX_PAD_1)
+
+  // Serial2 (Bluetooth BLE_HJ580XP or WiFi) - SERCOM5
+  #define PIN_SERIAL2_TX      (55ul)
+  #define PIN_SERIAL2_RX      (56ul)
+  #define PAD_SERIAL2_TX      (UART_TX_PAD_2)
+  #define PAD_SERIAL2_RX      (SERCOM_RX_PAD_3)
+
+  // SerialSOK (Alternate use of SERCOM4-I2C: TX-SDA, RX-SCL) (SERIAL_OVER_I2C)
+  #define PIN_SERIALSOK_TX    (45ul)
+  #define PIN_SERIALSOK_RX    (46ul)
+  #define PAD_SERIALSOK_TX    (UART_TX_PAD_0)
+  #define PAD_SERIALSOK_RX    (SERCOM_RX_PAD_1)
+
 
 
 /*
@@ -211,34 +229,34 @@ static const uint8_t ATN =  PIN_ATN;
  */
 #define SPI_INTERFACES_COUNT 2
 
-// Primary SPI pins (SPI, EXTERNAL) - SERCOM1
-#define PIN_SPI_MOSI         (49u)
-#define PIN_SPI_SCK          (50u)
-#define PIN_SPI_MISO         (51u)
-#define PIN_SPI_SS           NOT_CONNECTED_PIN // NC, UNDEFINED
-#define PERIPH_SPI           sercom1
-#define PAD_SPI_TX           SPI_PAD_3_SCK_1
-#define PAD_SPI_RX           SERCOM_RX_PAD_2
+  // Primary SPI pins (SPI, EXTERNAL) - SERCOM1
+  #define PIN_SPI_MOSI         (49u)
+  #define PIN_SPI_SCK          (50u)
+  #define PIN_SPI_MISO         (51u)
+  #define PIN_SPI_SS           NOT_CONNECTED_PIN // NC, UNDEFINED
+  #define PERIPH_SPI           sercom1
+  #define PAD_SPI_TX           SPI_PAD_3_SCK_1
+  #define PAD_SPI_RX           SERCOM_RX_PAD_2
 
-static const uint8_t MOSI = PIN_SPI_MOSI ;
-static const uint8_t SCK  = PIN_SPI_SCK  ;
-static const uint8_t MISO = PIN_SPI_MISO ;
-static const uint8_t SS   = PIN_SPI_SS   ;  // HW SS isn't used. Set here only for reference.
+  static const uint8_t MOSI = PIN_SPI_MOSI ;
+  static const uint8_t SCK  = PIN_SPI_SCK  ;
+  static const uint8_t MISO = PIN_SPI_MISO ;
+  static const uint8_t SS   = PIN_SPI_SS   ;  // HW SS isn't used. Set here only for reference.
 
 
-// Secondary SPI pins (SPI1, INTERNAL) - SERCOM2: Connected to microSD reader 
-#define PIN_SPI1_MOSI        (52u)
-#define PIN_SPI1_SCK         (53u)
-#define PIN_SPI1_MISO        (54u)
-#define PIN_SPI1_SS          NOT_CONNECTED_PIN // NC, UNDEFINED
-#define PERIPH_SPI1          sercom2
-#define PAD_SPI1_TX          SPI_PAD_3_SCK_1
-#define PAD_SPI1_RX          SERCOM_RX_PAD_0
+  // Secondary SPI pins (SPI1, INTERNAL) - SERCOM2: Connected to microSD reader 
+  #define PIN_SPI1_MOSI        (52u)
+  #define PIN_SPI1_SCK         (53u)
+  #define PIN_SPI1_MISO        (54u)
+  #define PIN_SPI1_SS          NOT_CONNECTED_PIN // NC, UNDEFINED
+  #define PERIPH_SPI1          sercom2
+  #define PAD_SPI1_TX          SPI_PAD_3_SCK_1
+  #define PAD_SPI1_RX          SERCOM_RX_PAD_0
 
-static const uint8_t MOSI1 = PIN_SPI1_MOSI ;
-static const uint8_t SCK1  = PIN_SPI1_SCK  ;
-static const uint8_t MISO1 = PIN_SPI1_MISO ;
-static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only for reference.
+  static const uint8_t MOSI1 = PIN_SPI1_MOSI ;
+  static const uint8_t SCK1  = PIN_SPI1_SCK  ;
+  static const uint8_t MISO1 = PIN_SPI1_MISO ;
+  static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only for reference.
 
 
 // Needed for SD library, taken from MKRZero variant.h file
@@ -257,28 +275,31 @@ static const uint8_t SS1   = PIN_SPI1_SS   ;  // HW SS isn't used. Set here only
 #endif
 
 
+
 /*
  * Wire Interfaces
  */
+
 #define WIRE_INTERFACES_COUNT 2
 
-// Primary I2C pins (I2C, EXTERNAL) - SERCOM4
-#define PIN_WIRE_SDA         (45u)
-#define PIN_WIRE_SCL         (46u)
-#define PERIPH_WIRE          sercom4
-#define WIRE_IT_HANDLER      SERCOM4_Handler
+  // Primary I2C pins (I2C, EXTERNAL) - SERCOM4
+  #define PIN_WIRE_SDA         (45u)
+  #define PIN_WIRE_SCL         (46u)
+  #define PERIPH_WIRE          sercom4
+  #define WIRE_IT_HANDLER      SERCOM4_Handler
 
-static const uint8_t SDA = PIN_WIRE_SDA;
-static const uint8_t SCL = PIN_WIRE_SCL;
+  static const uint8_t SDA = PIN_WIRE_SDA;
+  static const uint8_t SCL = PIN_WIRE_SCL;
 
-// Secondary I2C pins (I2C1, INTERNAL) - SERCOM3
-#define PIN_WIRE1_SDA         (47u)
-#define PIN_WIRE1_SCL         (48u)
-#define PERIPH_WIRE1          sercom3
-#define WIRE1_IT_HANDLER      SERCOM3_Handler 
+  // Secondary I2C pins (I2C1, INTERNAL) - SERCOM3
+  #define PIN_WIRE1_SDA         (47u)
+  #define PIN_WIRE1_SCL         (48u)
+  #define PERIPH_WIRE1          sercom3
+  #define WIRE1_IT_HANDLER      SERCOM3_Handler 
 
-static const uint8_t SDA1 = PIN_WIRE1_SDA;
-static const uint8_t SCL1 = PIN_WIRE1_SCL;
+  static const uint8_t SDA1 = PIN_WIRE1_SDA;
+  static const uint8_t SCL1 = PIN_WIRE1_SCL;
+
 
 
 /*
@@ -289,12 +310,13 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
 #define PIN_USB_DP            (56ul)
 
 
+
 /*
  * I2S Interfaces
  */
 #define I2S_INTERFACES_COUNT 1
 
-#if defined(USE_EXTERNAL_I2S) // EXTERNAL I2S0
+#if defined(USE_EXTERNAL_I2S0) // EXTERNAL I2S0
   #define I2S_DEVICE          0
   #define I2S_CLOCK_GENERATOR 3
   #define PIN_I2S_SD          (3u)     // D3  PA07 (I2S_SD[0])
@@ -310,9 +332,12 @@ static const uint8_t SCL1 = PIN_WIRE1_SCL;
   #define PIN_I2S_MCK         NOT_CONNECTED_PIN
 #endif
 
+
+
 #ifdef __cplusplus
 }
 #endif
+
 
 
 /*----------------------------------------------------------------------------
@@ -353,11 +378,10 @@ extern Uart SerialSOK;
 //
 // SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
 //                            pins are NOT connected to anything by default.
-#define SERIAL_PORT_USBVIRTUAL      Serial
 #define SERIAL_PORT_MONITOR         Serial
-
-#define SERIAL_PORT_HARDWARE        Serial2
-#define SERIAL_PORT_HARDWARE_OPEN   Serial1
+#define SERIAL_PORT_USBVIRTUAL      Serial
+#define SERIAL_PORT_HARDWARE        Serial2 // attached to BLE
+#define SERIAL_PORT_HARDWARE_OPEN   Serial1 // & SerialSOK
 
 
 
