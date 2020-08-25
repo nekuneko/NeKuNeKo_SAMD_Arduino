@@ -22,8 +22,8 @@ Just open the (**Tools** > **Board** > **Boards Manager**) and install the packa
 
 * SoK Zero Dawn (ATSAMD21J18A)
 * SoK M4 Advance (ATSAMD51J20A)
-* Kitten Display (ATSAMD21E18A)
 * Kitten Syringe (ATSAMD21E18A)
+* Kitten Display (ATSAMD21E18A)
 
 ## Support
 
@@ -39,7 +39,7 @@ http://forum.arduino.cc/index.php?board=98.0
 
 If you find a bug you can submit an issue here on github:
 
-https://github.com/nekuneko/NekuNko_Arduino_Boards/issues
+https://github.com/nekuneko/NekuNeko_Arduino_Boards/issues
 
 Before posting a new issue, please check if the same problem has been already reported by someone else
 to avoid duplicates.
