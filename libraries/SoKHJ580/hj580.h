@@ -3,12 +3,12 @@
 #include <Arduino.h>
 
 // Extern defined used global constants in variant.h file
-// BLE_RESET    -> PIN*
-// BLE_ENABLE   -> PIN
-// BLE_CONFIG   -> PIN*
-// BLE_MSTR_SLV -> PIN
-// BLE_STATE    -> PIN
-// Serial2
+extern uint8_t BLE_RESET;
+extern uint8_t BLE_ENABLE;
+extern uint8_t BLE_CONFIG;
+extern uint8_t BLE_MSTR_SLV;
+extern uint8_t BLE_STATE;
+extern Uart Serial2;
 
 // Integrated BLE 
 class HJ580

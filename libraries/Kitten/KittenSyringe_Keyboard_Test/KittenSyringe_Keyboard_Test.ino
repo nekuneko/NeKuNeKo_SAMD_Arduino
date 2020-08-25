@@ -32,16 +32,21 @@
 #define WINDOWS 1
 #define UBUNTU 2
 
+// change this to match your platform:
+int platform = WINDOWS;
+
+// Inject Button
+// uint8_t BTTN_INJECT = A1; // Defined on Variant.h
+
 // Neopixel
 Adafruit_NeoPixel neopixel(1, D8, NEO_GRB + NEO_KHZ800);
 
-// change this to match your platform:
-int platform = WINDOWS;
+
 
 void setup() {
   // make pin D1 an input and turn on the pull-up resistor so it goes high unless
   // connected to ground:
-  pinMode(D1, INPUT_PULLUP);
+  pinMode(BTTN_INJECT, INPUT_PULLUP);
   Keyboard.begin();
   
   neopixel.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
@@ -50,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  while (digitalRead(1) == HIGH) {
+  while (digitalRead(BTTN_INJECT)) {
     // do nothing until pin 2 goes low
     neopixel.setPixelColor(0, 0, 0, 0); // red, green, blue
     neopixel.show();
