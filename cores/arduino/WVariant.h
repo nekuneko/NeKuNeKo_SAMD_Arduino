@@ -101,16 +101,16 @@ typedef enum _ETCChannel
   TCC0_CH3 = (0<<8)|(3),
   TCC0_CH4 = (0<<8)|(4),
   TCC0_CH5 = (0<<8)|(5),
-  TCC0_CH6 = (0<<8)|(6), // Neku Was Here! Added in order to use TCC0_CH6 on SAMD51J NO
-  TCC0_CH7 = (0<<8)|(7), // Neku Was Here! Added in order to use TCC0_CH7 on SAMD51J NO
+  TCC0_CH6 = (0<<8)|(6),
+  TCC0_CH7 = (0<<8)|(7),
   TCC1_CH0 = (1<<8)|(0),
   TCC1_CH1 = (1<<8)|(1),
   TCC1_CH2 = (1<<8)|(2),
   TCC1_CH3 = (1<<8)|(3),
-  TCC1_CH4 = (1<<8)|(4), // Neku Was Here! Added in order to use TCC1_CH4 on SAMD51J NO
-  TCC1_CH5 = (1<<8)|(5), // Neku Was Here! Added in order to use TCC1_CH5 on SAMD51J NO 
-  TCC1_CH6 = (1<<8)|(6), // Neku Was Here! Added in order to use TCC1_CH6 on SAMD51J NO 
-  TCC1_CH7 = (1<<8)|(7), // Neku Was Here! Added in order to use TCC1_CH7 on SAMD51J OK
+  TCC1_CH4 = (1<<8)|(4),
+  TCC1_CH5 = (1<<8)|(5),
+  TCC1_CH6 = (1<<8)|(6),
+  TCC1_CH7 = (1<<8)|(7),
   TCC2_CH0 = (2<<8)|(0),
   TCC2_CH1 = (2<<8)|(1),
   TCC2_CH2 = (2<<8)|(2),
@@ -122,7 +122,6 @@ typedef enum _ETCChannel
   TC0_CH1 =  (5<<8)|(1),
   TC1_CH0 =  (6<<8)|(0),
   TC1_CH1 =  (6<<8)|(1),
-  TC1_CH6 =  (6<<8)|(6),
   TC2_CH0 =  (7<<8)|(0),
   TC2_CH1 =  (7<<8)|(1),
   TC3_CH0 =  (8<<8)|(0),
@@ -130,11 +129,11 @@ typedef enum _ETCChannel
   TC4_CH0 =  (9<<8)|(0),
   TC4_CH1 =  (9<<8)|(1),
   TC5_CH0 =  (10<<8)|(0),
-  TC5_CH1 =  (10<<8)|(1),/*
-  TC6_CH0 =  (11<<8)|(0),  // Neku Was Here! Added in order to use TC6 & TC7 on SAMD51J
-  TC6_CH1 =  (11<<8)|(1),  // Neku Was Here! Added in order to use TC6 & TC7 on SAMD51J
-  TC7_CH0 =  (12<<8)|(0),  // Neku Was Here! Added in order to use TC6 & TC7 on SAMD51J
-  TC7_CH1 =  (12<<8)|(1),  // Neku Was Here! Added in order to use TC6 & TC7 on SAMD51J*/
+  TC5_CH1 =  (10<<8)|(1),
+  TC6_CH0 =  (11<<8)|(0),
+  TC6_CH1 =  (11<<8)|(1),
+  TC7_CH0 =  (12<<8)|(0),
+  TC7_CH1 =  (12<<8)|(1),
 } ETCChannel ;
 
 #elif defined(__SAMD51P19A__) || defined(__SAMD51P20A__)
@@ -207,15 +206,11 @@ typedef enum _ETCChannel
   TCC2_CH3 = (2<<8)|(1), // Channel 3 is 1!
   TC3_CH0  = (3<<8)|(0),
   TC3_CH1  = (3<<8)|(1),
-  TC3_CH2  = (3<<8)|(2), // NWH
-  TC3_CH3  = (3<<8)|(3), // NWH 
-  TC3_CH4  = (3<<8)|(3), // NWH 
-  TC3_CH5  = (3<<8)|(3), // NWH 
   TC4_CH0  = (4<<8)|(0),
   TC4_CH1  = (4<<8)|(1),
   TC5_CH0  = (5<<8)|(0),
   TC5_CH1  = (5<<8)|(1),
-  #if defined (__SAMD21J18A__) // Neku Was Here! Added in order to use TC6 & TC7 on SAMD21J
+  #if defined (__SAMD21J18A__) 
     TC6_CH0  = (6<<8)|(0),
     TC6_CH1  = (6<<8)|(1),
     TC7_CH0  = (7<<8)|(0),
@@ -245,10 +240,6 @@ typedef enum _EPWMChannel
   PWM2_CH3=TCC2_CH3,
   PWM3_CH0=TC3_CH0,
   PWM3_CH1=TC3_CH1,
-  PWM3_CH2=TC3_CH2, // NWH
-  PWM3_CH3=TC3_CH3, // NWH
-  PWM3_CH4=TC3_CH4, // NWH
-  PWM3_CH5=TC3_CH5, // NWH
   PWM4_CH0=TC4_CH0,
   PWM4_CH1=TC4_CH1,
   PWM5_CH0=TC5_CH0,

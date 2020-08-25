@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Ha Thach for Adafruit Industries
+ * Copyright (c) 2019 Ha Thach (tinyusb.org)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +20,31 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * This file is part of the TinyUSB stack.
  */
 
-#ifndef ADAFRUIT_USBD_CDC_H_
-#define ADAFRUIT_USBD_CDC_H_
+#include "tusb_option.h"
 
-#include "Adafruit_USBD_Device.h"
-#include "Stream.h"
+#if TUSB_OPT_HOST_ENABLED && (CFG_TUSB_MCU == OPT_MCU_LPC18XX || CFG_TUSB_MCU == OPT_MCU_LPC43XX)
 
-class Adafruit_USBD_CDC : public Stream, Adafruit_USBD_Interface
+#include "chip.h"
+
+// LPC18xx and 43xx use EHCI driver
+
+void hcd_int_enable(uint8_t rhport)
 {
-public:
-	Adafruit_USBD_CDC(void);
+  NVIC_EnableIRQ(rhport ? USB1_IRQn : USB0_IRQn);
+}
 
-	// fron Adafruit_USBD_Interface
-	virtual uint16_t getDescriptor(uint8_t itfnum, uint8_t* buf, uint16_t bufsize);
+void hcd_int_disable(uint8_t rhport)
+{
+  NVIC_DisableIRQ(rhport ? USB1_IRQn : USB0_IRQn);
+}
 
-	void setPins(uint8_t pin_rx, uint8_t pin_tx) { (void) pin_rx; (void) pin_tx; }
-	void begin(uint32_t baud_count);
-	void begin(uint32_t baud, uint8_t config);
-	void end(void);
+uint32_t hcd_ehci_register_addr(uint8_t rhport)
+{
+  return (uint32_t) (rhport ? &LPC_USB1->USBCMD_H : &LPC_USB0->USBCMD_H );
+}
 
-	virtual int    available(void);
-	virtual int    peek(void);
-	virtual int    read(void);
-	virtual void   flush(void);
-	virtual size_t write(uint8_t);
-
-	virtual size_t write(const uint8_t *buffer, size_t size);
-	size_t write(const char *buffer, size_t size) {
-	  return write((const uint8_t *)buffer, size);
-	}
-
-	virtual int availableForWrite(void);
-	using Print::write; // pull in write(str) from Print
-	operator bool();
-};
-
-extern Adafruit_USBD_CDC Serial;
-
-#endif /* ADAFRUIT_USBD_CDC_H_ */
+#endif
