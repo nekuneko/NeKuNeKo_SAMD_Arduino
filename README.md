@@ -1,9 +1,14 @@
-# Arduino Core for SAMD21 and SAMD51 CPU
+# Arduino Core for NeKuNeKo's SAMD21 and SAMD51 MCU boards based on Adafruit SAMD21 & SAMD51 Boards
 
 This repository contains the source code and configuration files of the Arduino Core
 for Atmel's SAMD21 and SAMD51 processor (used on the Arduino/Genuino Zero, MKR1000 and MKRZero boards).
 
-In particular, this adds support for the NeKuNeKo SAMD Boards such as the SoK Zero Dawn & SoK M4 Advance.
+## Supported boards
+
+* SoK Zero Dawn (ATSAMD21J18A)
+* SoK M4 Advance (ATSAMD51J20A)
+* Kitten Syringe (ATSAMD21E18A)
+* Kitten Display (ATSAMD21E18A)
 
 ## Installation on Arduino IDE
 
@@ -18,12 +23,7 @@ Just open the (**Tools** > **Board** > **Boards Manager**) and install the packa
 
 **NekuNeko SAMD Boards (32-bit ARM Cortex-M0+)**
 
-## Supported boards
 
-* SoK Zero Dawn (ATSAMD21J18A)
-* SoK M4 Advance (ATSAMD51J20A)
-* Kitten Syringe (ATSAMD21E18A)
-* Kitten Display (ATSAMD21E18A)
 
 ## Support
 
