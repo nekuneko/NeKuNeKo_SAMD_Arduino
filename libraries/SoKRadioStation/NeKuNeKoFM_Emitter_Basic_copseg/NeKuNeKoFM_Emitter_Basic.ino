@@ -18,31 +18,18 @@
   Many thx to https://github.com/phrm/fmtx/blob/master/firmware/firmware.ino !
 
  ****************************************************/
-#include <ArduinoLowPower.h>
-uint64_t previousMillis = 0;
-uint64_t currentMillis  = 0;   
-#define SLEEP_AFTER_MS  2000 // 10000, 10s
 
 #include <Wire.h>
 #include <Adafruit_Si4713.h>
 #define _BV(n) (1 << n)
 
-//#define SI471X_CMD_DEBUG
+#define SI471X_CMD_DEBUG
 //#define RESETPIN D13 // SoK
+#define RESETPIN D10 // Kitten Syringe
+//#define RESETPIN D4  // Kitten Display
 
- 
-#define RESETPIN FSC_IRQ // Kitten Syringe/Display 
-//#define SI4713_I2CADDR 0x63
-// */
-//
-#define SI4713_I2CADDR 0x11 // old
-// */
- 
-#define BTTN_SEEK BTTN_INJECT // Kitten Syringe 2.0
 
-#define ENABLE_SLEEP
-
-#define FMSTATION 9800      // 10230 == 102.30 MHz
+#define FMSTATION 10230      // 10230 == 102.30 MHz
 
 Adafruit_Si4713 radio = Adafruit_Si4713(RESETPIN);
 
@@ -56,7 +43,7 @@ void setup()
   //while(!Serial); // wait until Arduino Serial Monitor is open */
   Serial.println("NeKuNeKo's SoK Radio Station - Si4713 Test");
   
-  while (! radio.begin(SI4713_I2CADDR, &Wire)) {  // begin with address 0x63 (CS high)
+  while (! radio.begin(0x11, &Wire)) {  // begin with address 0x11 (CS low)
     Serial.println("Couldn't find radio?");
     delay (1000);
   }
@@ -64,7 +51,7 @@ void setup()
   // Show IC information
   radio.getRev();
   radio.setGPIOctrl(_BV(1) | _BV(2));  // set GP1 and GP2 to output
-  radio.setGPIO(_BV(1) | _BV(2));      // turn ON Both leds
+  //radio.setGPIO(_BV(1) | _BV(2));      // turn ON Both leds
   uint8_t stat = radio.getStatus();
   Serial.print("status: 0x");
   Serial.println(stat, HEX); 
@@ -119,33 +106,4 @@ void loop()
   delay(500);
   radio.setGPIO(_BV(2));
   delay(500); //*/
-
-  #ifdef ENABLE_SLEEP
-  // Standby Mode
-  currentMillis = millis(); 
-  //Serial.print("Current: "); Serial.println((long) currentMillis);
-  //Serial.print("Previous: "); Serial.println((long) previousMillis);
-  if(currentMillis - previousMillis > SLEEP_AFTER_MS)
-  {
-    Serial.println("gotosleep");
-    USBDevice.detach();
-    
-    LowPower.attachInterruptWakeup(BTTN_SEEK, [] (void) {}, CHANGE);
-    LowPower.attachInterruptWakeup(FSP_IRQ,   [] (void) {}, CHANGE);
-    // Triggers an infinite sleep (the device will be woken up only by the registered wakeup sources)
-    // The power consumption of the chip will drop consistently
-    //LowPower.idle(); // Ok, no apaga USB
-    LowPower.sleep(); // Ok, apaga USB
-    detachInterrupt(BTTN_SEEK);
-    detachInterrupt(FSP_IRQ);
-    
-    USBDevice.attach();
-
-    //myReceiver = IRrecvPCI(FSP_IRQ);
-    //myReceiver.enableIRIn(); 
-    
-    previousMillis = millis();
-  } //*/
-#endif // ENABLE_SLEEP
-
 }
