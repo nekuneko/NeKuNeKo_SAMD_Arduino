@@ -64,7 +64,7 @@ const PinDescription g_APinDescription[]=
   { PORTB, 16, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0  },  // 21 D21                       /         /               / INT_0* / (I2S_SCK0)
   { PORTA, 20, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4  },  // 22 D22                       /         /               / INT_4* / (I2S_FS0)
   { PORTA, 18, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_2  },  // 23 D23                       /         /               / INT_2  / (INT_IMU)
-  { PORTA, 21, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5  },  // 24 D24                       /         /               / INT_5* / (NC) 
+  { PORTA,  0, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_0  },  // 24 D24                       /         /               / INT_0* / (INT_APDS) 
  
 
   // 25...44 - Analog pins (digitals hidden also)
@@ -153,6 +153,8 @@ const PinDescription g_APinDescription[]=
   { PORTA, 10, PIO_COM, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_10  },
   { PORTA, 11, PIO_COM, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_11  },
 
+  // 69 Not connected
+  { PORTA, 21, PIO_OUTPUT,      (PIN_ATTR_DIGITAL),                 No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5  },  // 69 D69                       /         /               / INT_5* / (NC) 
 
 } ;
 

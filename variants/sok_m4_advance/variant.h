@@ -187,11 +187,11 @@ static const uint8_t ATN =  PIN_ATN;
 #define BLE_MSTR_SLV (18u)
 #define BLE_STATE    (19u)
 
-// APDS Interupt
-#define INT_APDS     (60u) // PA00
-
 // IMU Interrupt
 #define INT_IMU      (23u) // PA18
+
+// APDS Interupt
+#define INT_APDS     (24u) // PA00
 
 // FingerSoK Interfaces custom pins
 #define FSP_IRQ      (50u) // SCK
