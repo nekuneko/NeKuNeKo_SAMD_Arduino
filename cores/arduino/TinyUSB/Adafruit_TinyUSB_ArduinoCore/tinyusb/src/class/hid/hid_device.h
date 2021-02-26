@@ -39,8 +39,14 @@
 // Class Driver Default Configure & Validation
 //--------------------------------------------------------------------+
 
-#ifndef CFG_TUD_HID_BUFSIZE
-#define CFG_TUD_HID_BUFSIZE     16
+#if !defined(CFG_TUD_HID_EP_BUFSIZE) & defined(CFG_TUD_HID_BUFSIZE)
+  // TODO warn user to use new name later on
+  // #warning CFG_TUD_HID_BUFSIZE is renamed to CFG_TUD_HID_EP_BUFSIZE, please update to use the new name
+  #define CFG_TUD_HID_EP_BUFSIZE  CFG_TUD_HID_BUFSIZE
+#endif
+
+#ifndef CFG_TUD_HID_EP_BUFSIZE
+  #define CFG_TUD_HID_EP_BUFSIZE     16
 #endif
 
 //--------------------------------------------------------------------+
@@ -70,16 +76,16 @@ bool tud_hid_mouse_report(uint8_t report_id, uint8_t buttons, int8_t x, int8_t y
 
 // Invoked when received GET HID REPORT DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-TU_ATTR_WEAK uint8_t const * tud_hid_descriptor_report_cb(void);
+uint8_t const * tud_hid_descriptor_report_cb(void);
 
 // Invoked when received GET_REPORT control request
 // Application must fill buffer report's content and return its length.
 // Return zero will cause the stack to STALL request
-TU_ATTR_WEAK uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen);
+uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen);
 
 // Invoked when received SET_REPORT control request or
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
-TU_ATTR_WEAK void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize);
+void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize);
 
 // Invoked when received SET_PROTOCOL request ( mode switch Boot <-> Report )
 TU_ATTR_WEAK void tud_hid_boot_mode_cb(uint8_t boot_mode);
@@ -242,12 +248,12 @@ TU_ATTR_WEAK bool tud_hid_set_idle_cb(uint8_t idle_rate);
   HID_COLLECTION_END \
 
 // Gamepad Report Descriptor Template
-// with 16 buttons and 2 joysticks with following layout
-// | Button Map (2 bytes) |  X | Y | Z | Rz
+// with 16 buttons, 2 joysticks and 1 hat/dpad with following layout
+// | Button Map (2 bytes) |  X | Y | Z | Rz (1 byte each) | hat/DPAD (1 byte)
 #define TUD_HID_REPORT_DESC_GAMEPAD(...) \
-  HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP     )        ,\
-  HID_USAGE      ( HID_USAGE_DESKTOP_GAMEPAD  )        ,\
-  HID_COLLECTION ( HID_COLLECTION_APPLICATION )        ,\
+  HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP     )                 ,\
+  HID_USAGE      ( HID_USAGE_DESKTOP_GAMEPAD  )                 ,\
+  HID_COLLECTION ( HID_COLLECTION_APPLICATION )                 ,\
     /* Report ID if any */\
     __VA_ARGS__ \
     /* 16 bit Button Map */ \
@@ -258,16 +264,26 @@ TU_ATTR_WEAK bool tud_hid_set_idle_cb(uint8_t idle_rate);
     HID_LOGICAL_MAX  ( 1                                      ) ,\
     HID_REPORT_COUNT ( 16                                     ) ,\
     HID_REPORT_SIZE  ( 1                                      ) ,\
-    HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE    ) ,\
-    /* X, Y, Z, Rz (min -127, max 127 ) */ \
+    HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,\
+    /* 8 bit X, Y, Z, Rz (min -127, max 127 ) */ \
     HID_USAGE_PAGE   ( HID_USAGE_PAGE_DESKTOP                 ) ,\
-    HID_LOGICAL_MIN  ( 0x81                                   ) ,\
-    HID_LOGICAL_MAX  ( 0x7f                                   ) ,\
     HID_USAGE        ( HID_USAGE_DESKTOP_X                    ) ,\
     HID_USAGE        ( HID_USAGE_DESKTOP_Y                    ) ,\
     HID_USAGE        ( HID_USAGE_DESKTOP_Z                    ) ,\
     HID_USAGE        ( HID_USAGE_DESKTOP_RZ                   ) ,\
+    HID_LOGICAL_MIN  ( 0x81                                   ) ,\
+    HID_LOGICAL_MAX  ( 0x7f                                   ) ,\
     HID_REPORT_COUNT ( 4                                      ) ,\
+    HID_REPORT_SIZE  ( 8                                      ) ,\
+    HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,\
+    /* 8 bit Hat Button Map  */ \
+    HID_USAGE_PAGE   ( HID_USAGE_PAGE_DESKTOP                 ) ,\
+    HID_USAGE        ( HID_USAGE_DESKTOP_HAT_SWITCH           ) ,\
+    HID_LOGICAL_MIN  ( 0                                      ) ,\
+    HID_LOGICAL_MAX  ( 8                                      ) ,\
+    HID_PHYSICAL_MIN ( 0                                      ) ,\
+    HID_PHYSICAL_MAX_N ( 315, 2                               ) ,\
+    HID_REPORT_COUNT ( 1                                      ) ,\
     HID_REPORT_SIZE  ( 8                                      ) ,\
     HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,\
   HID_COLLECTION_END \
@@ -300,12 +316,12 @@ TU_ATTR_WEAK bool tud_hid_set_idle_cb(uint8_t idle_rate);
 //--------------------------------------------------------------------+
 // Internal Class Driver API
 //--------------------------------------------------------------------+
-void hidd_init             (void);
-void hidd_reset            (uint8_t rhport);
-bool hidd_open             (uint8_t rhport, tusb_desc_interface_t const * itf_desc, uint16_t *p_length);
-bool hidd_control_request  (uint8_t rhport, tusb_control_request_t const * request);
-bool hidd_control_complete (uint8_t rhport, tusb_control_request_t const * request);
-bool hidd_xfer_cb          (uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t xferred_bytes);
+void     hidd_init             (void);
+void     hidd_reset            (uint8_t rhport);
+uint16_t hidd_open             (uint8_t rhport, tusb_desc_interface_t const * itf_desc, uint16_t max_len);
+bool     hidd_control_request  (uint8_t rhport, tusb_control_request_t const * request);
+bool     hidd_control_complete (uint8_t rhport, tusb_control_request_t const * request);
+bool     hidd_xfer_cb          (uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t xferred_bytes);
 
 #ifdef __cplusplus
  }

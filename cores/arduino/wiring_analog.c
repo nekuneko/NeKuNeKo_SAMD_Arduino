@@ -298,7 +298,7 @@ uint32_t analogRead(uint32_t pin)
 		
 		while (DAC->SYNCBUSY.bit.ENABLE);
 	#else
-	  if (pin ==PIN_DAC0) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
+	  if (pin == PIN_DAC0) { // Disable DAC, if analogWrite(A0,dval) used previously the DAC is enabled
 	    syncDAC();
 		
 		DAC->CTRLA.bit.ENABLE = 0x00; // Disable DAC
