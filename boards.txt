@@ -53,7 +53,7 @@ sok_zero_dawn.build.variant_system_lib=
 sok_zero_dawn.build.vid=0x1993
 sok_zero_dawn.build.pid=0xB000
 sok_zero_dawn.bootloader.tool=openocd
-sok_zero_dawn.bootloader.file=sok_zero_dawn/build/bootloader-sok_zero_dawn-v3.10.0-9-ge585be5-dirty.bin
+sok_zero_dawn.bootloader.file=sok_zero_dawn/build/bootloader-sok_zero_dawn-v3.13.0-dirty.bin
 sok_zero_dawn.menu.usbstack.arduino=Arduino
 sok_zero_dawn.menu.usbstack.tinyusb=TinyUSB
 sok_zero_dawn.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
@@ -71,6 +71,7 @@ sok_zero_dawn.menu.i2s.ext.build.flags.i2s=-DUSE_EXTERNAL_I2S0
 sok_zero_dawn.menu.serialwire.off=Disabled
 sok_zero_dawn.menu.serialwire.on=Enabled
 sok_zero_dawn.menu.serialwire.on.build.flags.serialwire=-DUSE_SERIAL_OVER_I2C
+
 
 
 # SoK M4 Advance (SAMD51J20A)
@@ -100,7 +101,7 @@ sok_m4_advance.build.variant_system_lib=
 sok_m4_advance.build.vid=0x1993
 sok_m4_advance.build.pid=0xB001
 sok_m4_advance.bootloader.tool=openocd
-sok_m4_advance.bootloader.file=sok_m4_advance/build/bootloader-sok_m4_advance-v3.10.0-9-ge585be5-dirty.bin
+sok_m4_advance.bootloader.file=sok_m4_advance/build/bootloader-sok_m4_advance-v3.13.0-dirty.bin
 sok_m4_advance.compiler.arm.cmsis.ldflags="-L{runtime.tools.CMSIS-5.4.0.path}/CMSIS/Lib/GCC/" "-L{build.variant.path}" -larm_cortexM4lf_math -mfloat-abi=hard -mfpu=fpv4-sp-d16
 sok_m4_advance.menu.cache.on=Enabled
 sok_m4_advance.menu.cache.on.build.cache_flags=-DENABLE_CACHE
@@ -147,6 +148,8 @@ sok_m4_advance.menu.serialwire.off=Disabled
 sok_m4_advance.menu.serialwire.on=Enabled
 sok_m4_advance.menu.serialwire.on.build.flags.serialwire=-DUSE_SERIAL_OVER_I2C
 
+
+
 # Kitten Syringe (SAMD21E18A)
 # ------------------------------
 kitten_syringe.name=Kitten Syringe (SAMD21E18A)
@@ -175,7 +178,7 @@ kitten_syringe.build.variant_system_lib=
 kitten_syringe.build.vid=0x1993
 kitten_syringe.build.pid=0xB002
 kitten_syringe.bootloader.tool=openocd
-kitten_syringe.bootloader.file=kitten_syringe/build/bootloader-kitten_syringe-v3.10.0-9-ge585be5-dirty.bin
+kitten_syringe.bootloader.file=kitten_syringe/build/bootloader-kitten_syringe-v3.13.0-dirty.bin
 kitten_syringe.menu.usbstack.arduino=Arduino
 kitten_syringe.menu.usbstack.tinyusb=TinyUSB
 kitten_syringe.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
@@ -188,6 +191,7 @@ kitten_syringe.menu.serialwire.on.build.flags.serialwire=-DUSE_SERIAL_OVER_I2C
 kitten_syringe.menu.serialspi.off=Disabled
 kitten_syringe.menu.serialspi.on=Enabled
 kitten_syringe.menu.serialspi.on.build.flags.serialspi=-DUSE_SERIAL_OVER_SPI
+
 
 
 # Kitten Display (SAMD21E18A)
@@ -218,7 +222,7 @@ kitten_display.build.variant_system_lib=
 kitten_display.build.vid=0x1993
 kitten_display.build.pid=0xB003
 kitten_display.bootloader.tool=openocd
-kitten_display.bootloader.file=kitten_display/build/bootloader-kitten_display-v3.10.0-9-ge585be5-dirty.bin
+kitten_display.bootloader.file=kitten_display/build/bootloader-kitten_display-v3.13.0-dirty.bin
 kitten_display.menu.usbstack.arduino=Arduino
 kitten_display.menu.usbstack.tinyusb=TinyUSB
 kitten_display.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
